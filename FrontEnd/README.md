@@ -1,3 +1,23 @@
-#Electrify
-An academic project within the ESPRIT cursus 
- Thanks to Powerchain, we will offer an efficient solution to manage the grid and avoid energy waste during peak hours. This will insure an easy and affordable access to electricity.
+# Electrify FrontEnd :
+
+This is the frontend project built with react.
+
+## Installation :
+
+First ensure that you have `create-react-app` globally .
+
+1. Run the following command .
+
+   ```js
+   npm install -g create-react-app
+   ```
+
+2. Then, install all necessary dependencies of frontend project..
+   ```javascript
+   npm install
+   ```
+3. Finally, run the frontend project.
+   ```javascript
+   // ensure that you are inside the Electrify/FrontEnd directory when running this
+   npm start
+   ```
