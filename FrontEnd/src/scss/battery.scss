@@ -1,0 +1,140 @@
+@import url("https://fonts.googleapis.com/css?family=Nunito");
+:root {
+    --background-color: rgb(50, 50, 50);
+    --acid-height: 0;
+    --display-charging: "none";
+}
+
+
+.cell {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.percentage {
+    font-size: 100%;
+    font-weight: bold;
+    color: white;
+    margin-top: 15px;
+}
+.percentage i {
+    margin-right: 6px;
+    display: var(--display-charging);
+}
+
+.info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    margin: 5px;
+    font-size: 80%;
+    color: rgba(255, 255, 255, 0.5);
+    transition: .2s ease-in-out;
+}
+.info:hover {
+    color: white;
+}
+.info i {
+    margin-right: 5px;
+}
+.info a {
+    color: inherit;
+}
+
+.battery {
+    position: relative;
+    width: 130px;
+    height: 250px;
+    border: 4px solid #FFF;
+    border-radius: 25px;
+}
+.battery:after {
+    position: absolute;
+    top: -18px;
+    left: 40px;
+    width: 40px;
+    height: 10px;
+    background-color: #FFF;
+    border-radius: 5px 5px 0px 0px;
+    content: '';
+}
+
+.acid-container {
+    overflow: hidden;
+    height: calc(100% - 8px);
+    border-radius: 18px;
+    margin: 4px;
+}
+.acid-container .acid {
+    height: 250px;
+    display: flex;
+    flex-direction: column;
+    flex-flow: column-reverse;
+}
+.acid-container .acid .fill {
+    background: white;
+    height: var(--acid-height);
+    width: 100%;
+    flex-shrink: 0;
+    transition: height 2s ease-in-out;
+}
+.acid-container .acid .waves {
+    display: block;
+    width: 100%;
+    height: 10px;
+    margin-bottom: -1px;
+}
+.acid-container .acid .waves .parallax > use {
+    -webkit-animation: move-forever 12s linear infinite;
+    animation: move-forever 12s linear infinite;
+}
+.acid-container .acid .waves .parallax > use:nth-child(1) {
+    -webkit-animation-delay: -2s;
+    animation-delay: -2s;
+    fill: rgba(255, 255, 255, 0.6);
+}
+.acid-container .acid .waves .parallax > use:nth-child(2) {
+    -webkit-animation-delay: -2s;
+    animation-delay: -2s;
+    -webkit-animation-duration: 5s;
+    animation-duration: 5s;
+    fill: rgba(255, 255, 255, 0.8);
+}
+.acid-container .acid .waves .parallax > use:nth-child(3) {
+    -webkit-animation-delay: -4s;
+    animation-delay: -4s;
+    -webkit-animation-duration: 3s;
+    animation-duration: 3s;
+    fill: white;
+}
+@-webkit-keyframes move-forever {
+    0% {
+        -webkit-transform: translate(-90px, 0%);
+        transform: translate(-90px, 0%);
+    }
+    100% {
+        -webkit-transform: translate(85px, 0%);
+        transform: translate(85px, 0%);
+    }
+}
+@keyframes move-forever {
+    0% {
+        -webkit-transform: translate(-90px, 0%);
+        transform: translate(-90px, 0%);
+    }
+    100% {
+        -webkit-transform: translate(85px, 0%);
+        transform: translate(85px, 0%);
+    }
+}
+
+.text-white{
+    height: 336px;
+}
+
