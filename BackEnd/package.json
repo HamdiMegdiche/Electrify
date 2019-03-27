@@ -1,7 +1,14 @@
 {
-  "name": "electrify-backend",
-  "description": "electrify-backend",
-  "license": "ISC",
+  "name": "@electrify/backend",
+  "version": "0.0.1",
+  "description": "Electrify Academic Project (Computer Science Engineering)",
+  "copyright": "Copyright 2019 HEXAGONE 4TWIN2",
+  "license": "ESPRIT",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/HamdiMegdiche/Electrify.git"
+  },
   "scripts": {
     "start": "node server.js"
   },

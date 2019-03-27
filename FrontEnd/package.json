@@ -2,14 +2,14 @@
   "name": "@electrify/powerchain",
   "version": "0.0.1",
   "description": "Electrify Academic Project (Computer Science Engineering)",
-  "author": "Idriss Mahjoubi",
+  "author": "HEXAGONE",
   "homepage": "https://coreui.io",
   "copyright": "Copyright 2019 HEXAGONE 4TWIN2",
   "license": "ESPRIT",
   "private": true,
   "repository": {
     "type": "git",
-    "url": "git@github.com:IdrissMahjoubi/electrifytheme.git"
+    "url": "https://github.com/HamdiMegdiche/Electrify.git"
   },
   "dependencies": {
     "@coreui/coreui": "^2.1.7",
