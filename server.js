@@ -9,12 +9,12 @@ const cors = require('cors');
 const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
 
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+let app = express();
+let server = require('http').createServer(app);
+let io = require('socket.io')(server);
 
 // connect to mongoDB
-let mongoUrl = process.env.MONGO_CONNECTION_STRING;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoUrl, {
     useCreateIndex: true,
@@ -26,7 +26,7 @@ mongoose.connect(mongoUrl, {
     process.exit();
   });
 
-app.set('port', process.env.SERVER_PORT || 3001);
+app.set('port', process.env.SERVER_PORT || 4000);
 // allow-cors
 app.use(cors());
 
@@ -45,6 +45,11 @@ app.use('/api', require("./routes"));
 app.use(errorHandler());
 
 
-app.listen(app.get('port'), function () {
+server.listen(app.get('port'),(error) => {
+  if (error) {
+    console.error(`\n${error}`);
+    server.close();
+    process.exit(1);
+  }
   console.log(`Server Listening at http://localhost:${app.get('port')}/`);
 });

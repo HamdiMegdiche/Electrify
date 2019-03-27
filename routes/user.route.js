@@ -9,6 +9,35 @@ const {
     UserModel
 } = require("../models");
 
+
+//just for testing performance
+router.post('/test', async (req, res) => {
+    for (let i = 101; i <= 201; i++) {
+        let user = new UserModel({
+            username: `user${i}`,
+            email: `user${i}@outlook.fr`,
+            password: 'test'
+        });
+        // console.log('Try to create user'+i);
+        await user.save((err) => {
+            if (err)
+                res.send(err);
+        });
+        // console.log('created user'+i);
+    }
+    return res.sendStatus(200);
+});
+
+// get all users
+router.get('/', auth, (req, res) => {
+    UserModel.find((err, users) => {
+        if (err)
+            console.log(err);
+
+        return res.json(users);
+    });
+});
+
 // get user by id
 router.get('/:id', auth, (req, res) => {
     UserModel.findById(req.params.id, (err, user) => {
@@ -21,13 +50,15 @@ router.get('/:id', auth, (req, res) => {
 
 // update user
 router.post('/update/:id', auth, function (req, res) {
+    var { email, password, username} = req.body;
+
     UserModel.findById(req.params.id, function (err, doc) {
         if (err) {
             console.log(err);
         }
-        doc.username = req.body.username;
-        doc.email = req.body.email;
-        doc.password = bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10));
+        doc.username = username;
+        doc.email = email;
+        doc.password = bcrypt.hashSync(password, bcrypt.genSaltSync(10));
         doc.save((err, doc) => {
             if (err)
                 res.send(err);
@@ -39,10 +70,12 @@ router.post('/update/:id', auth, function (req, res) {
 
 //register user
 router.post('/register', (req, res) => {
+    let { email, password, username} = req.body;
+
     let user = new UserModel({
-        username: req.body.username,
-        email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, bcrypt.genSaltSync(10))
+        username,
+        email,
+        password: bcrypt.hashSync(password, bcrypt.genSaltSync(10))
     });
 
 
@@ -55,16 +88,15 @@ router.post('/register', (req, res) => {
 });
 
 //login
-router.post('/login', function (req, res) {
-    UserModel.findOne({
-        email: req.body.email
-    }, function (err, user) {
+router.post('/login', (req, res) => {
+    let { email, password } = req.body;
+    UserModel.findOne({ email }, function (err, user) {
         if (err)
             res.send(err);
         if (!user)
             res.status(401).json(user);
         else {
-            if (bcrypt.compareSync(req.body.password, user.password)) {
+            if (bcrypt.compareSync(password, user.password)) {
                 console.log('user found', user);
                 let token = jwt.sign({
                     email: user.email

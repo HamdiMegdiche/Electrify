@@ -1,3 +1,17 @@
+package-lock.json
+yarn.lock
+
+# OS or Editor folders
+.DS_Store
+.cache
+.project
+.settings
+.tags
+.tmproj
+nbproject
+Thumbs.db
+tags
+
 # Logs
 logs
 *.log
