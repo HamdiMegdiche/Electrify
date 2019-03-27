@@ -29,7 +29,7 @@ router.post('/test', async (req, res) => {
 });
 
 // get all users
-router.get('/', auth, (req, res) => {
+router.get('/', (req, res) => {
     UserModel.find((err, users) => {
         if (err)
             console.log(err);
