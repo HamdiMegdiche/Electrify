@@ -30,11 +30,6 @@ const Page404 = Loadable({
   loading
 });
 
-const Page500 = Loadable({
-  loader: () => import("./views/Pages/Page500/Page500"),
-  loading
-});
-
 class App extends Component {
   // componentDidMount = async () => {
   //   const { contract, web3 } = await getContract();
@@ -86,7 +81,6 @@ class App extends Component {
             component={Register}
           />
           <Route exact path="/404" name="Page 404" component={Page404} />
-          <Route exact path="/500" name="Page 500" component={Page500} />
           <Route path="/" name="Home" component={DefaultLayout} />
         </Switch>
       </BrowserRouter>

@@ -38,17 +38,17 @@ export default {
       children: [
         {
           name: "Consumption",
-          url: "/smart-hub",
+          url: "/consumption",
           icon: "cui-lightbulb"
         },
         {
           name: "My Energy",
-          url: "/smart-hub",
+          url: "/my-energy",
           icon: "fa fa-bolt"
         },
         {
           name: "Real-Time Energy",
-          url: "/smart-hub",
+          url: "/real-time",
           icon: "cui-chart"
         }
       ]
@@ -67,7 +67,7 @@ export default {
     },
     {
       name: "Suggested Offers",
-      url: "/suggested-offers",
+      url: "/recommendation",
       icon: "fa fa-thumbs-up"
     },
     {
