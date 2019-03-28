@@ -1,6 +1,6 @@
 package-lock.json
 yarn.lock
-src/contracts/*
+src/contracts/*.json
 
 # OS or Editor folders
 .DS_Store
