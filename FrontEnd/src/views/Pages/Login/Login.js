@@ -14,8 +14,56 @@ import {
   InputGroupText,
   Row
 } from "reactstrap";
+import { Alert } from "reactstrap";
+import api from "../../../api";
 
 class Login extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      username: "",
+      password: "",
+      errorMsg: "",
+      visible: true
+    };
+  }
+  connectUser = async event => {
+    event.preventDefault();
+
+    const credentials = {
+      username: this.state.username,
+      password: this.state.password
+    };
+
+    console.log(`credentials typed : ${JSON.stringify(credentials)}`);
+
+    try {
+      const res = await api.post(`user/login`, credentials);
+      if (res.data) {
+        console.log("User credentials are correct");
+        console.log(res.data);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        localStorage.setItem("token", res.data.token);
+
+        this.props.history.push("/dashboard");
+      }
+    } catch (error) {
+      this.setState({ errorMsg: "credentials are incorrect !", visible: true });
+    }
+  };
+
+  handleChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value,
+      errorMsg: "",
+      visible: false
+    });
+  };
+
+  onDismiss = () => {
+    this.setState({ visible: false });
+  };
+
   render() {
     return (
       <div className="app flex-row align-items-center">
@@ -25,9 +73,13 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form>
+                    <Form onSubmit={e => this.connectUser(e)}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
+                      <p className="text-muted">
+                        Login: hamdi / Password: test
+                      </p>
+
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
                           <InputGroupText>
@@ -35,9 +87,11 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
+                          onChange={this.handleChange}
                           type="text"
                           placeholder="Username"
                           autoComplete="username"
+                          name="username"
                         />
                       </InputGroup>
                       <InputGroup className="mb-4">
@@ -47,14 +101,34 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
+                          onChange={this.handleChange}
                           type="password"
                           placeholder="Password"
                           autoComplete="current-password"
+                          name="password"
                         />
                       </InputGroup>
+                      {this.state.errorMsg !== "" ? (
+                        <Row>
+                          <Col>
+                            <Alert
+                              color="danger"
+                              isOpen={this.state.visible}
+                              toggle={this.onDismiss}
+                            >
+                              {this.state.errorMsg}
+                            </Alert>
+                          </Col>
+                        </Row>
+                      ) : null}
                       <Row>
                         <Col xs="6">
-                          <Button color="primary" className="px-4">
+                          <Button
+                            onClick={this.connectUser}
+                            color="primary"
+                            className="px-4"
+                            name="connectButton"
+                          >
                             Login
                           </Button>
                         </Col>

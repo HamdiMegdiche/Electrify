@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import Loadable from "react-loadable";
 import "./App.scss";
 import getContract from "./utils/getContract";
+import PrivateRoute from "./PrivateRoute";
 
 const loading = () => (
   <div className="animated fadeIn pt-3 text-center">Calculating Energy...</div>
@@ -80,8 +81,10 @@ class App extends Component {
             name="Register Page"
             component={Register}
           />
-          <Route exact path="/404" name="Page 404" component={Page404} />
-          <Route path="/" name="Home" component={DefaultLayout} />
+          <PrivateRoute path="/" name="Home" component={DefaultLayout} />
+
+          <Route path="/404" exct name="Page 404" component={Page404} />
+
         </Switch>
       </BrowserRouter>
     );

@@ -14,13 +14,13 @@ let server = require('http').createServer(app);
 let io = require('socket.io')(server);
 
 // connect to mongoDB
-let mongoUrl = process.env.MONGO_CONNECTION_STRING;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
 mongoose.Promise = global.Promise;
 mongoose.connect(mongoUrl, {
     useCreateIndex: true,
     useNewUrlParser: true
   })
-  .then(() => console.log('Connected to MongoDB'))
+  .then(() => console.log('Connected to MongoDB Remotely'))
   .catch(err => {
     console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
     process.exit();

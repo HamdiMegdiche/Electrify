@@ -24,6 +24,11 @@ const DefaultFooter = React.lazy(() => import("./DefaultFooter"));
 const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
 
 class DefaultLayout extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { connectedUser: null };
+  }
+
   loading = () => (
     <div className="animated fadeIn pt-1 text-center">
       Calculating Energy...
@@ -32,6 +37,7 @@ class DefaultLayout extends Component {
 
   signOut(e) {
     e.preventDefault();
+    localStorage.clear();
     this.props.history.push("/login");
   }
 
@@ -69,8 +75,11 @@ class DefaultLayout extends Component {
                       />
                     ) : null;
                   })}
-                  {}
-                  <Redirect from="/" to="/login" />
+                  {localStorage.getItem("user") ? (
+                    <Redirect from="/" to="/dashboard" />
+                  ) : (
+                    <Redirect from="/" to="/login" />
+                  )}
                 </Switch>
               </Suspense>
             </Container>
