@@ -45,6 +45,7 @@ Install `MetaMask` extension [here](https://metamask.io/) and follow the documen
 
 2. Then, install all necessary dependencies of frontend project.
    ```javascript
+   // ensure that you are inside the Electrify/FrontEnd directory when running this
    npm install
    ```
 3. Finally, run the frontend project:
