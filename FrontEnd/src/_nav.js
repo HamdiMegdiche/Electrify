@@ -1,73 +1,89 @@
 export default {
   items: [
     {
-      name: 'Dashboard',
-      url: '/dashboard',
-      icon: 'icon-speedometer',
-
+      title: true,
+      name: "Analytics"
+    },
+    {
+      name: "Dashboard",
+      url: "/dashboard",
+      icon: "icon-speedometer"
     },
     {
       title: true,
-      name: 'Analytics',
-      wrapper: {            // optional wrapper object
-        element: '',        // required valid HTML5 element tag
-        attributes: {}        // optional valid JS object with JS API naming ex: { className: "my-class", style: { fontFamily: "Verdana" }, id: "my-id"}
-      },
-      class: ''             // optional class names space delimited list for title item ex: "text-center"
+      name: "Powerchain"
     },
     {
-      name: 'Smart-Hub',
-      url: '/smart-hub',
-      icon: 'icon-gear',
+      name: "Trades",
+      url: "/trades",
+      icon: "fa fa-exchange"
+    },
+    {
+      name: "Offers",
+      url: "/offers",
+      icon: "cui-cart"
+    },
+    {
+      name: "Settings",
+      url: "/settings",
+      icon: "cui-wrench"
+    },
+    {
+      divider: true
+    },
+    {
+      name: "Smart-Hub",
+      url: "/smart-hub",
+      icon: "fa fa-microchip",
       children: [
         {
-          name: 'Consumption',
-          url: '/smart-hub',
-          icon: 'icon-bell',
+          name: "Consumption",
+          url: "/smart-hub",
+          icon: "cui-lightbulb"
         },
         {
-          name: 'My Energy',
-          url: '/smart-hub',
-          icon: 'icon-bell',
+          name: "My Energy",
+          url: "/smart-hub",
+          icon: "fa fa-bolt"
         },
         {
-          name: 'Real-Time Energy',
-          url: '/smart-hub',
-          icon: 'icon-bell',
-        },
-      ],
+          name: "Real-Time Energy",
+          url: "/smart-hub",
+          icon: "cui-chart"
+        }
+      ]
     },
     {
-      divider: true,
+      divider: true
     },
     {
       title: true,
-      name: 'Recommondations',
+      name: "Recommondations"
     },
     {
-      name: 'House Hold',
-      url: '/house-hold',
-      icon: 'icon-star',
+      name: "House Hold",
+      url: "/house-hold",
+      icon: "fa fa-home"
     },
     {
-      name: 'Suggested Offers',
-      url: '/suggested-offers',
-      icon: 'icon-ban',
+      name: "Suggested Offers",
+      url: "/suggested-offers",
+      icon: "fa fa-thumbs-up"
     },
     {
-      name: 'Download Report',
-      url: 'https://coreui.io/react/',
-      icon: 'icon-cloud-download',
-      class: 'mt-auto',
-      variant: 'success',
-      attributes: { target: '_blank', rel: "noopener" },
+      name: "Download Report",
+      url: "",
+      icon: "icon-cloud-download",
+      class: "mt-auto",
+      variant: "success",
+      attributes: { target: "_blank", rel: "noopener" }
     },
     {
-      name: 'Upgrade To Prosumer',
-      url: 'https://coreui.io/pro/react/',
-      icon: 'icon-layers',
-      variant: 'danger',
-      attributes: { target: '_blank', rel: "noopener" },
-    },
-  ],
+      name: "Upgrade To Prosumer",
+      url: "",
+      icon: "icon-layers",
+      variant: "danger",
+      attributes: { target: "_blank", rel: "noopener" }
+    }
+  ]
 };
