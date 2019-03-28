@@ -1,7 +1,7 @@
 import React from "react";
 import DefaultLayout from "./containers/DefaultLayout";
 
-const Dashboard = React.lazy(() => import("./views/Dashboard"));
+const Dashboard = React.lazy(() => import("./views/Pages/Dashboard/Dashboard"));
 const Users = React.lazy(() => import("./views/Pages/Users/Users"));
 const User = React.lazy(() => import("./views/Pages/Users/User"));
 const Trades = React.lazy(() => import("./views/Pages/Trades/Trades"));
