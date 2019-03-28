@@ -49,6 +49,11 @@ Install `MetaMask` extension [here](https://metamask.io/) and follow the documen
    npm install
    ```
 3. Finally, run the frontend project:
+
+   - Before running the app, `ganache` must be started at `http://127.0.0.1:7545`and `MetaMask` connected to that network with the first account imported from `ganache`.
+
+   - Before compiling, delete the content of directory `src/contracts`.
+
    - Compile and migrate the smart contracts (smart contract changes must be manually recompiled and migrated).
      ```js
      // ensure that you are inside the Electrify/FrontEnd directory when running this
