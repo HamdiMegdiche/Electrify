@@ -1,12 +1,12 @@
-# Electrify BackEnd :
+# Electrify BackEnd
 
 This is the backend project built with Node & Express.
 
-## Installation :
+## Installation
 
 First ensure that you have `nodemon` globally and create a mongo database named `Electrify`.
 
-1. Run the following command .
+1. Run the following command :
 
    ```js
    npm install -g nodemon
