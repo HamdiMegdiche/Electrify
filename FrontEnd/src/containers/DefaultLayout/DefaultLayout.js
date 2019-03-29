@@ -29,11 +29,7 @@ class DefaultLayout extends Component {
     this.state = { connectedUser: null };
   }
 
-  loading = () => (
-    <div className="animated fadeIn pt-1 text-center">
-      Calculating Energy...
-    </div>
-  );
+  loading = () => <div class="sk-rotating-plane" />;
 
   signOut(e) {
     e.preventDefault();
@@ -76,9 +72,9 @@ class DefaultLayout extends Component {
                     ) : null;
                   })}
                   {localStorage.getItem("user") ? (
-                    <Redirect from="/" to="/dashboard" />
+                    <Redirect to="/dashboard" />
                   ) : (
-                    <Redirect from="/" to="/login" />
+                    <Redirect to="/login" />
                   )}
                 </Switch>
               </Suspense>

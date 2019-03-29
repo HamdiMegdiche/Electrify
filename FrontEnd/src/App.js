@@ -5,9 +5,7 @@ import "./App.scss";
 import getContract from "./utils/getContract";
 import PrivateRoute from "./PrivateRoute";
 
-const loading = () => (
-  <div className="animated fadeIn pt-3 text-center">Calculating Energy...</div>
-);
+const loading = () => <div class="sk-rotating-plane" />;
 
 // Containers
 const DefaultLayout = Loadable({
@@ -84,7 +82,6 @@ class App extends Component {
           <PrivateRoute path="/" name="Home" component={DefaultLayout} />
 
           <Route path="/404" exct name="Page 404" component={Page404} />
-
         </Switch>
       </BrowserRouter>
     );

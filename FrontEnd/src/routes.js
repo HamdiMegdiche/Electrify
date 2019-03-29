@@ -6,6 +6,8 @@ const Users = React.lazy(() => import("./views/Pages/Users/Users"));
 const User = React.lazy(() => import("./views/Pages/Users/User"));
 const Trades = React.lazy(() => import("./views/Pages/Trades/Trades"));
 const Offers = React.lazy(() => import("./views/Pages/Offers/Offers"));
+const OfferForm = React.lazy(() => import("./views/Pages/Offers/OfferForm"));
+const MyOffers = React.lazy(() => import("./views/Pages/Offers/MyOffers"));
 const Settings = React.lazy(() => import("./views/Pages/Settings/Settings"));
 const Consumption = React.lazy(() =>
   import("./views/Pages/SmartHub/Consumption")
@@ -22,6 +24,18 @@ const routes = [
   { path: "/dashboard", exact: true, name: "Dashboard", component: Dashboard },
   { path: "/trades", exact: true, name: "Trades", component: Trades },
   { path: "/offers", exact: true, name: "Offers", component: Offers },
+  {
+    path: "/offers/make-offer",
+    exact: true,
+    name: "Make Offer",
+    component: OfferForm
+  },
+  {
+    path: "/offers/my-offers",
+    exact: true,
+    name: "My Offers",
+    component: MyOffers
+  },
   { path: "/settings", exact: true, name: "Settings", component: Settings },
   {
     path: "/consumption",

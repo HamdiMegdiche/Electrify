@@ -77,13 +77,6 @@ export default {
       class: "mt-auto",
       variant: "success",
       attributes: { target: "_blank", rel: "noopener" }
-    },
-    {
-      name: "Upgrade To Prosumer",
-      url: "",
-      icon: "icon-layers",
-      variant: "danger",
-      attributes: { target: "_blank", rel: "noopener" }
     }
   ]
 };
