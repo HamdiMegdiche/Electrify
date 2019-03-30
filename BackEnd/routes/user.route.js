@@ -100,26 +100,29 @@ router.post('/login', (req, res) => {
   UserModel.findOne({ username }).then(user => {
     // Check for user
     if (!user) {
-      errors.username = 'user not found';
-      return res.status(404).json(errors);
+      return res.status(404).json('user not found');
     }
 
     // Check Password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
         // User Matched
-        const payload = { id: user.id, name: user.name, avatar: user.avatar }; // Create JWT Payload
+        const payload = { id: user.id, name: user.username, avatar: user.avatar }; // Create JWT Payload
 
         // Sign Token
         jwt.sign(payload, keys.TOKEN_KEY, { expiresIn: 3600 }, (err, token) => {
           res.json({
             success: true,
-            token: 'Bearer ' + token
+            token,
+            user: {
+              username: user.username,
+              id: user.id,
+              avatar: user.avatar
+            }
           });
         });
       } else {
-        errors.password = 'Password incorrect';
-        return res.status(400).json(errors);
+        return res.status(400).json('Password incorrect');
       }
     });
   });

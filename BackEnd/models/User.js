@@ -22,11 +22,6 @@ const UserSchema = new mongoose.Schema(
     //set the avatar from avatar server || set default avatar
     avatar: {
       type: String
-    },
-    //set the date
-    registredAt: {
-      type: Date,
-      default: Date.now
     }
   },
   {

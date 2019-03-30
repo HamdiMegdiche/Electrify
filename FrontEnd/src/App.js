@@ -5,7 +5,7 @@ import "./App.scss";
 import getContract from "./utils/getContract";
 import PrivateRoute from "./PrivateRoute";
 
-const loading = () => <div class="sk-rotating-plane" />;
+const loading = () => <div className="sk-rotating-plane" />;
 
 // Containers
 const DefaultLayout = Loadable({

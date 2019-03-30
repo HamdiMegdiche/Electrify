@@ -29,7 +29,7 @@ class DefaultLayout extends Component {
     this.state = { connectedUser: null };
   }
 
-  loading = () => <div class="sk-rotating-plane" />;
+  loading = () => <div className="sk-rotating-plane" />;
 
   signOut(e) {
     e.preventDefault();
