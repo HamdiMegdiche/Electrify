@@ -15,6 +15,8 @@ import {
   Label,
   Row
 } from "reactstrap";
+import api from "../../../api";
+import { Alert } from "reactstrap";
 
 export default class OfferForm extends Component {
   constructor(props) {
@@ -25,9 +27,18 @@ export default class OfferForm extends Component {
     this.state = {
       collapse: true,
       fadeIn: true,
-      timeout: 300
+      timeout: 300,
+      errorMsg: "",
+      visible: false,
+      quantity: 2000,
+      unitPrice: 1,
+      total: 2
     };
   }
+
+  onDismiss = () => {
+    this.setState({ visible: false });
+  };
 
   toggle() {
     this.setState({ collapse: !this.state.collapse });
@@ -39,6 +50,81 @@ export default class OfferForm extends Component {
     });
   }
 
+  handleChange = event => {
+    let total = 0;
+    if (
+      event.target.value > 0 &&
+      this.state.unitPrice > 0 &&
+      event.target.name === "quantity"
+    )
+      total = (event.target.value / 1000) * this.state.unitPrice;
+    else if (
+      this.state.quantity > 0 &&
+      event.target.value > 0 &&
+      event.target.name === "unitPrice"
+    )
+      total = (this.state.quantity / 1000) * event.target.value;
+
+    this.setState({
+      [event.target.name]: event.target.value,
+      errorMsg: "",
+      total,
+      visible: false
+    });
+  };
+
+  handlerMakeOffer = async e => {
+    e.preventDefault();
+
+    if (this.state.unitPrice <= 0 || isNaN(this.state.unitPrice))
+      return this.setState({
+        errorMsg: "kWh price must be a number greater than 0",
+        visible: true
+      });
+
+    if (
+      this.state.quantity <= 0 ||
+      isNaN(this.state.quantity) ||
+      this.state.quantity.toString(10).includes(".", 0) ||
+      this.state.quantity.toString(10).includes(",", 0)
+    )
+      return this.setState({
+        errorMsg: "Quantity must be an integer greater than 0",
+        visible: true
+      });
+
+    try {
+      let body = {
+        from: JSON.parse(localStorage.getItem("user")).id,
+        unitPrice: this.state.unitPrice,
+        quantity: this.state.quantity
+      };
+
+      const res = await api.post(`offers/create`, JSON.stringify(body), {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          "Content-Type": "application/json"
+        }
+      });
+      if (res.data) {
+        let { _id: id, username, email, createdAt } = res.data;
+        createdAt = new Date(createdAt).toLocaleString();
+
+        this.setState({ id, username, email, createdAt });
+        this.props.history.push("/offers/my-offers");
+      } else {
+        this.props.history.push("/404");
+      }
+    } catch (error) {
+      console.error(error);
+      this.setState({ errorMsg: "erreur", visible: true });
+    }
+  };
+
+  handlerCancelMakeOffer = e => {
+    e.preventDefault();
+    this.setState({ quantity: 0, total: 0, unitPrice: 0, visible: false });
+  };
   render() {
     return (
       <div className="animated fadeIn">
@@ -58,7 +144,7 @@ export default class OfferForm extends Component {
                       </Col>
                       <Col md="9">
                         <p className="form-control-static">
-                          0xlkjahsdlkajshdsdalskjdh
+                          {JSON.parse(localStorage.getItem("user")).id}
                         </p>
                       </Col>
                     </FormGroup>
@@ -66,16 +152,19 @@ export default class OfferForm extends Component {
                       <Col>
                         <InputGroup>
                           <InputGroupAddon addonType="prepend">
-                            <InputGroupText>Ether</InputGroupText>
+                            <InputGroupText>kWh price</InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            type="text"
+                            type="number"
                             id="input3-group1"
-                            name="input3-group1"
+                            name="unitPrice"
                             placeholder=".."
+                            required
+                            value={this.state.unitPrice}
+                            onChange={this.handleChange}
                           />
                           <InputGroupAddon addonType="append">
-                            <InputGroupText>.00</InputGroupText>
+                            <InputGroupText>Ether</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
                       </Col>
@@ -87,75 +176,50 @@ export default class OfferForm extends Component {
                             <InputGroupText>Energy</InputGroupText>
                           </InputGroupAddon>
                           <Input
-                            type="text"
+                            type="number"
+                            pattern="[0-9]*"
                             id="input3-group1"
-                            name="input3-group1"
+                            name="quantity"
                             placeholder=".."
+                            required
+                            value={this.state.quantity}
+                            onChange={this.handleChange}
                           />
                           <InputGroupAddon addonType="append">
-                            <InputGroupText>Kwh</InputGroupText>
+                            <InputGroupText>Wh</InputGroupText>
                           </InputGroupAddon>
                         </InputGroup>
                       </Col>
                     </FormGroup>
                     <FormGroup row>
-                      <Col md="3">
-                        <Label>Deliver Method</Label>
-                      </Col>
-                      <Col md="9">
-                        <FormGroup check inline>
+                      <Col>
+                        <InputGroup>
+                          <InputGroupAddon addonType="prepend">
+                            <InputGroupText>Total</InputGroupText>
+                          </InputGroupAddon>
                           <Input
-                            className="form-check-input"
-                            type="radio"
-                            id="inline-radio1"
-                            name="inline-radios"
-                            value="option1"
+                            type="text"
+                            id="input3-group1"
+                            name="input3-group1"
+                            value={this.state.total}
+                            disabled
                           />
-                          <Label
-                            className="form-check-label"
-                            check
-                            htmlFor="inline-radio1"
-                          >
-                            Slow
-                          </Label>
-                        </FormGroup>
-                        <FormGroup check inline>
-                          <Input
-                            className="form-check-input"
-                            type="radio"
-                            id="inline-radio2"
-                            name="inline-radios"
-                            value="option2"
-                          />
-                          <Label
-                            className="form-check-label"
-                            check
-                            htmlFor="inline-radio2"
-                          >
-                            Average
-                          </Label>
-                        </FormGroup>
-                        <FormGroup check inline>
-                          <Input
-                            className="form-check-input"
-                            type="radio"
-                            id="inline-radio3"
-                            name="inline-radios"
-                            value="option3"
-                          />
-                          <Label
-                            className="form-check-label"
-                            check
-                            htmlFor="inline-radio3"
-                          >
-                            Fast
-                          </Label>
-                        </FormGroup>
+                          <InputGroupAddon addonType="append">
+                            <InputGroupText>Ether</InputGroupText>
+                          </InputGroupAddon>
+                        </InputGroup>
                       </Col>
                     </FormGroup>
                     <FormGroup>
+                      <Alert
+                        color="danger"
+                        isOpen={this.state.visible}
+                        toggle={this.onDismiss}
+                      >
+                        {this.state.errorMsg}
+                      </Alert>
                       <Button
-                        onClick={this.handlerMakeOffer}
+                        onClick={e => this.handlerMakeOffer(e)}
                         className="float-left"
                         color="success"
                         outline
@@ -164,7 +228,7 @@ export default class OfferForm extends Component {
                         &nbsp;Accept
                       </Button>
                       <Button
-                        onClick={this.handlerMakeOffer}
+                        onClick={e => this.handlerCancelMakeOffer(e)}
                         className="ml-2"
                         color="danger"
                         outline

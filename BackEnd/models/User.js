@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-//Changed File name to User.js
+
 const UserSchema = new mongoose.Schema(
   {
     username: {
@@ -11,9 +11,7 @@ const UserSchema = new mongoose.Schema(
     email: {
       type: String,
       lowercase: true,
-      unique: true,
       required: [true, "can't be blank"],
-      index: true
     },
     password: {
       type: String,
@@ -21,6 +19,9 @@ const UserSchema = new mongoose.Schema(
     },
     //set the avatar from avatar server || set default avatar
     avatar: {
+      type: String
+    },
+    smartHubId: {
       type: String
     }
   },

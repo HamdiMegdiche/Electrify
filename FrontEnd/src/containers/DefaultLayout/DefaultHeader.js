@@ -31,10 +31,26 @@ const Style = {
 const defaultProps = {};
 
 class DefaultHeader extends Component {
-  render() {
-    // eslint-disable-next-line
-    const { children, ...attributes } = this.props;
+  constructor(props) {
+    super(props);
 
+    this.state = {
+      id: "",
+      avatar: "../../assets/img/avatars/1.jpg",
+      email: ""
+    };
+  }
+
+  componentDidMount() {
+    let user = localStorage.getItem("user");
+
+    if (user) {
+      const { id, avatar, email } = JSON.parse(user);
+      this.setState({ id, avatar, email });
+    }
+  }
+
+  render() {
     return (
       <React.Fragment>
         <AppSidebarToggler className="d-lg-none" display="md" mobile />
@@ -86,9 +102,9 @@ class DefaultHeader extends Component {
           <AppHeaderDropdown direction="down">
             <DropdownToggle nav>
               <img
-                src={"../../assets/img/avatars/1.jpg"}
+                src={this.state.avatar}
                 className="img-avatar"
-                alt="admin@bootstrapmaster.com"
+                alt={this.state.email}
               />
             </DropdownToggle>
             <DropdownMenu right style={{ right: "auto" }}>
@@ -97,13 +113,13 @@ class DefaultHeader extends Component {
               </DropdownItem>
               <DropdownItem>
                 <i className="fa fa-user" />{" "}
-                <Link to={"/users/0"} style={Style}>
+                <Link to={`/users/${this.state.id}`} style={Style}>
                   Profile
                 </Link>
               </DropdownItem>
               <DropdownItem>
                 <i className="fa fa-wrench" />{" "}
-                <Link to={"/users/0"} style={Style}>
+                <Link to={`/users/${this.state.id}`} style={Style}>
                   Settings
                 </Link>
               </DropdownItem>
@@ -111,7 +127,7 @@ class DefaultHeader extends Component {
                 <i className="fa fa-usd" /> Payments
                 <Badge color="secondary">42</Badge>
               </DropdownItem>
-              <DropdownItem>
+              {/* <DropdownItem>
                 <i className="fa fa-file" /> History
                 <Badge color="primary">42</Badge>
               </DropdownItem>
@@ -120,7 +136,7 @@ class DefaultHeader extends Component {
               </DropdownItem>
               <DropdownItem>
                 <i className="fa fa-shield" /> Lock Account
-              </DropdownItem>
+              </DropdownItem> */}
               <DropdownItem onClick={e => this.props.onLogout(e)}>
                 <i className="fa fa-lock" /> Logout
               </DropdownItem>

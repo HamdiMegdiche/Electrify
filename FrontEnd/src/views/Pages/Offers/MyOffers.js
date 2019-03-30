@@ -5,18 +5,40 @@ import {
   CardBody,
   CardHeader,
   Col,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
+  // Pagination,
+  // PaginationItem,
+  // PaginationLink,
   Row,
   Table,
   Button
 } from "reactstrap";
+import api from "../../../api";
 
 export default class Offers extends Component {
   constructor(props) {
     super(props);
     this.handlerDeleteAll = this.handlerDeleteAll.bind(this);
+    this.state = { offers: [] };
+  }
+
+  async componentDidMount() {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+      const body = {
+        from: user.id
+      };
+
+      const res = await api.post(`offers/`, body);
+      if (res.data) {
+        const offers = res.data;
+
+        this.setState({ offers });
+      } else {
+        this.props.history.push("/404");
+      }
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   handlerDeleteAll = () => {
@@ -52,27 +74,33 @@ export default class Offers extends Component {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-trash" />
-                          &nbsp;Delete
-                        </Button>
-                      </td>
-                    </tr>
+                    {this.state.offers.map((value, idx) => {
+                      return (
+                        <tr>
+                          <td className="align-middle">{value._id}</td>
+                          <td className="align-middle">
+                            {value.quantity / 1000}
+                          </td>
+                          <td className="align-middle">{value.unitPrice}</td>
+                          <td className="align-middle">
+                            {new Date(value.createdAt).toLocaleString()}
+                          </td>
+                          <td className="align-middle">
+                            <Badge color="success">{value.status}</Badge>
+                          </td>
+                          <td className="align-middle">
+                            <Button color="danger" outline>
+                              <i className="cui-trash" />
+                              &nbsp;Delete
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </Table>
                 <nav>
-                  <Pagination>
+                  {/* <Pagination>
                     <PaginationItem>
                       <PaginationLink previous tag="button">
                         Prev
@@ -95,7 +123,7 @@ export default class Offers extends Component {
                         Next
                       </PaginationLink>
                     </PaginationItem>
-                  </Pagination>
+                  </Pagination> */}
                 </nav>
               </CardBody>
             </Card>
