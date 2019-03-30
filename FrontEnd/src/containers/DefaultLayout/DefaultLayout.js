@@ -26,10 +26,18 @@ const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
 class DefaultLayout extends Component {
   constructor(props) {
     super(props);
-    this.state = { connectedUser: null };
+    this.state = { user: null };
   }
 
-  loading = () => <div class="sk-rotating-plane" />;
+  componentDidMount(){
+    let user = localStorage.getItem("user");
+    if (user) {
+      user = JSON.parse(user);
+      this.setState({user});
+    }
+  }
+
+  loading = () => <div className="sk-rotating-plane" />;
 
   signOut(e) {
     e.preventDefault();
@@ -42,7 +50,7 @@ class DefaultLayout extends Component {
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} />
+            <DefaultHeader onLogout={e => this.signOut(e)} user={this.state.user} />
           </Suspense>
         </AppHeader>
         <div className="app-body">

@@ -5,9 +5,9 @@ import {
   CardBody,
   CardHeader,
   Col,
-  Pagination,
-  PaginationItem,
-  PaginationLink,
+  // Pagination,
+  // PaginationItem,
+  // PaginationLink,
   Row,
   Table,
   Button
@@ -57,8 +57,8 @@ export default class Offers extends Component {
                 <Table hover striped responsive>
                   <thead>
                     <tr>
-                      <th>Offer Id</th>
-                      <th>Energy (kwh)</th>
+                      <th>From</th>
+                      <th>Energy (Whats)</th>
                       <th>Price (Ether)</th>
                       <th>Date Posted</th>
                       <th>Status</th>
@@ -83,78 +83,10 @@ export default class Offers extends Component {
                         </Button>
                       </td>
                     </tr>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-credit-card" />
-                          &nbsp;Buy Now
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-credit-card" />
-                          &nbsp;Buy Now
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-credit-card" />
-                          &nbsp;Buy Now
-                        </Button>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-credit-card" />
-                          &nbsp;Buy Now
-                        </Button>
-                      </td>
-                    </tr>
                   </tbody>
                 </Table>
                 <nav>
-                  <Pagination>
+                  {/* <Pagination>
                     <PaginationItem>
                       <PaginationLink previous tag="button">
                         Prev
@@ -177,7 +109,7 @@ export default class Offers extends Component {
                         Next
                       </PaginationLink>
                     </PaginationItem>
-                  </Pagination>
+                  </Pagination> */}
                 </nav>
               </CardBody>
             </Card>
