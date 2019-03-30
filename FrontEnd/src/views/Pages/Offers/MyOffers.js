@@ -41,8 +41,28 @@ export default class Offers extends Component {
     }
   }
 
-  handlerDeleteAll = () => {
-    this.props.history.push("/offers/make-offer");
+  handlerDeleteOne = async (e, offer, index) => {
+    e.preventDefault();
+    try {
+      await api.delete(`offers/${offer._id}`);
+
+      let offers = this.state.offers;
+      offers.splice(index, 1);
+      this.setState({ offers });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  handlerDeleteAll = async () => {
+    try {
+      const body = { from: JSON.parse(localStorage.getItem("user")).id };
+
+      await api.post(`offers/delete`,body);
+
+      this.setState({ offers: [] });
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   render() {
@@ -64,19 +84,25 @@ export default class Offers extends Component {
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    <tr>
-                      <th>Offer Id</th>
-                      <th>Energy (kwh)</th>
-                      <th>Price (Ether)</th>
-                      <th>Date Posted</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
+                    {this.state.offers.length > 0 ? (
+                      <tr>
+                        <th>Offer Id</th>
+                        <th>Energy (kwh)</th>
+                        <th>Price (Ether)</th>
+                        <th>Date Posted</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <th>You didn't make any offer yet.</th>
+                      </tr>
+                    )}
                   </thead>
                   <tbody>
                     {this.state.offers.map((value, idx) => {
                       return (
-                        <tr>
+                        <tr key={value._id}>
                           <td className="align-middle">{value._id}</td>
                           <td className="align-middle">
                             {value.quantity / 1000}
@@ -89,7 +115,13 @@ export default class Offers extends Component {
                             <Badge color="success">{value.status}</Badge>
                           </td>
                           <td className="align-middle">
-                            <Button color="danger" outline>
+                            <Button
+                              color="danger"
+                              outline
+                              onClick={e =>
+                                this.handlerDeleteOne(e, value, idx)
+                              }
+                            >
                               <i className="cui-trash" />
                               &nbsp;Delete
                             </Button>

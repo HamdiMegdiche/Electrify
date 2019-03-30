@@ -12,12 +12,17 @@ import {
   Table,
   Button
 } from "reactstrap";
+import { Link } from "react-router-dom";
+
+import api from "../../../api";
 
 export default class Offers extends Component {
   constructor(props) {
     super(props);
     this.handlerMakeOffer = this.handlerMakeOffer.bind(this);
     this.handlerMyOffers = this.handlerMyOffers.bind(this);
+
+    this.state = { offers: [], user: null };
   }
 
   handlerMakeOffer = () => {
@@ -26,6 +31,28 @@ export default class Offers extends Component {
   handlerMyOffers = () => {
     this.props.history.push("/offers/my-offers");
   };
+
+  buyNow = async (e, offer) => {
+    e.preventDefault();
+    console.log("offer id: " + offer._id);
+    console.log("user id: " + this.state.user.id);
+  };
+
+  async componentDidMount() {
+    try {
+      const res = await api.get(`offers/`);
+      if (res.data) {
+        const offers = res.data;
+        const user = JSON.parse(localStorage.getItem("user"));
+        this.setState({ offers, user });
+      } else {
+        this.props.history.push("/404");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   render() {
     return (
       <div className="animated fadeIn">
@@ -56,33 +83,54 @@ export default class Offers extends Component {
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    <tr>
-                      <th>From</th>
-                      <th>Energy (Whats)</th>
-                      <th>Price (Ether)</th>
-                      <th>Date Posted</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
+                    {this.state.offers.length > 0 ? (
+                      <tr>
+                        <th>From</th>
+                        <th>Energy (kwh)</th>
+                        <th>Price (Ether)</th>
+                        <th>Date Posted</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    ) : (
+                      <tr>
+                        <th>There are no offers yet.</th>
+                      </tr>
+                    )}
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="align-middle">
-                        0xVasdfasdfasdfasdfkjhfasd
-                      </td>
-                      <td className="align-middle">300</td>
-                      <td className="align-middle">1000</td>
-                      <td className="align-middle">2012/01/01</td>
-                      <td className="align-middle">
-                        <Badge color="success">success</Badge>
-                      </td>
-                      <td className="align-middle">
-                        <Button color="danger" outline>
-                          <i className="cui-credit-card" />
-                          &nbsp;Buy Now
-                        </Button>
-                      </td>
-                    </tr>
+                    {this.state.offers.map((value, idx) => {
+                      return (
+                        <tr key={value._id}>
+                          <td className="align-middle">
+                            <Link to={`/users/${value.from}`}>
+                              {value.from}
+                            </Link>
+                          </td>
+                          <td className="align-middle">
+                            {value.quantity / 1000}
+                          </td>
+                          <td className="align-middle">{value.unitPrice}</td>
+                          <td className="align-middle">
+                            {new Date(value.createdAt).toLocaleString()}
+                          </td>
+                          <td className="align-middle">
+                            <Badge color="success">{value.status}</Badge>
+                          </td>
+                          <td className="align-middle">
+                            <Button
+                              color="danger"
+                              onClick={e => this.buyNow(e, value)}
+                              outline
+                              disabled={this.state.user.id === value.from}
+                            >
+                              <i className="cui-credit-card" />
+                              &nbsp;Buy Now
+                            </Button>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </Table>
                 <nav>

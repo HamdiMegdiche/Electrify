@@ -1,7 +1,7 @@
 const router = require('express').Router();
-const userRoutes = require('./user.route'); 
+const userRoutes = require('./users.route'); 
 const energyRoutes = require('./energy.route');
-const offersRoutes = require('./offers');
+const offersRoutes = require('./offers.route');
 
 router.get('/', (req, res) => {
   res.send({

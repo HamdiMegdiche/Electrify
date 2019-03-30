@@ -100,12 +100,7 @@ export default class OfferForm extends Component {
         quantity: this.state.quantity
       };
 
-      const res = await api.post(`offers/create`, JSON.stringify(body), {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-          "Content-Type": "application/json"
-        }
-      });
+      const res = await api.post(`offers/create`, JSON.stringify(body));
       if (res.data) {
         let { _id: id, username, email, createdAt } = res.data;
         createdAt = new Date(createdAt).toLocaleString();

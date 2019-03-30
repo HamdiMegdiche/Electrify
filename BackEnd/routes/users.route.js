@@ -9,8 +9,8 @@ const passport = require('passport');
 const {UserModel} = require('../models');
 
 // Load Input Validation
-const validateRegisterInput = require('./../validation/register');
-const validateLoginInput = require('./../validation/login');
+const validateRegisterInput = require('../validation/register');
+const validateLoginInput = require('../validation/login');
 
 //just for testing performance
 router.post('/test', async (req, res) => {
