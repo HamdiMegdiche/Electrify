@@ -1,5 +1,6 @@
 const router = require('express').Router();
 const userRoutes = require('./user.route'); 
+const energyRoutes = require('./energy.route');
 
 router.get("/", (req, res) => {
   res.send({
@@ -8,5 +9,6 @@ router.get("/", (req, res) => {
 });
 
 router.use("/user", userRoutes);
+router.use("/energy", energyRoutes);
 
 module.exports = router;

@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 import Battery from "../../components/Battery";
+import api from "../../../api";
 
 import {
   ButtonDropdown,
@@ -20,195 +21,15 @@ import { getStyle } from "@coreui/coreui/dist/js/coreui-utilities";
 const brandPrimary = getStyle("--primary");
 const brandInfo = getStyle("--info");
 
-// Card Chart 1
-const cardChartData1 = {
-  labels: [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "3asba"
-  ],
-  datasets: [
-    {
-      label: "My First dataset",
-      backgroundColor: brandPrimary,
-      borderColor: "rgba(255,255,255,.55)",
-      data: [65, 59, 84, 84, 51, 55, 40, 60]
-    }
-  ]
-};
+let myData;
+// var elements = 1440;
+var myProduction = [];
+var myConsumption = [];
+var myBattery = [];
+var myLabels = [];
 
-const cardChartOpts1 = {
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: false
-  },
-  scales: {
-    xAxes: [
-      {
-        gridLines: {
-          color: "transparent",
-          zeroLineColor: "transparent"
-        },
-        ticks: {
-          fontSize: 2,
-          fontColor: "transparent"
-        }
-      }
-    ],
-    yAxes: [
-      {
-        display: false,
-        ticks: {
-          display: false,
-          min: Math.min.apply(Math, cardChartData1.datasets[0].data) - 5,
-          max: Math.max.apply(Math, cardChartData1.datasets[0].data) + 5
-        }
-      }
-    ]
-  },
-  elements: {
-    line: {
-      borderWidth: 1
-    },
-    point: {
-      radius: 4,
-      hitRadius: 10,
-      hoverRadius: 4
-    }
-  }
-};
-
-// Card Chart 2
-const cardChartData2 = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
-  datasets: [
-    {
-      label: "My First dataset",
-      backgroundColor: brandInfo,
-      borderColor: "rgba(255,255,255,.55)",
-      data: [1, 18, 9, 17, 34, 22, 11]
-    }
-  ]
-};
-
-const cardChartOpts2 = {
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: false
-  },
-  scales: {
-    xAxes: [
-      {
-        gridLines: {
-          color: "transparent",
-          zeroLineColor: "transparent"
-        },
-        ticks: {
-          fontSize: 2,
-          fontColor: "transparent"
-        }
-      }
-    ],
-    yAxes: [
-      {
-        display: false,
-        ticks: {
-          display: false,
-          min: Math.min.apply(Math, cardChartData2.datasets[0].data) - 5,
-          max: Math.max.apply(Math, cardChartData2.datasets[0].data) + 5
-        }
-      }
-    ]
-  },
-  elements: {
-    line: {
-      tension: 0.00001,
-      borderWidth: 1
-    },
-    point: {
-      radius: 4,
-      hitRadius: 10,
-      hoverRadius: 4
-    }
-  }
-};
-
-// Card Chart 3
-const cardChartData3 = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
-  datasets: [
-    {
-      label: "My First dataset",
-      backgroundColor: "rgba(255,255,255,.2)",
-      borderColor: "rgba(255,255,255,.55)",
-      data: [78, 81, 80, 45, 34, 12, 40]
-    }
-  ]
-};
-
-const cardChartOpts3 = {
-  tooltips: {
-    enabled: false,
-    custom: CustomTooltips
-  },
-  maintainAspectRatio: false,
-  legend: {
-    display: false
-  },
-  scales: {
-    xAxes: [
-      {
-        display: false
-      }
-    ],
-    yAxes: [
-      {
-        display: false
-      }
-    ]
-  },
-  elements: {
-    line: {
-      borderWidth: 2
-    },
-    point: {
-      radius: 0,
-      hitRadius: 10,
-      hoverRadius: 4
-    }
-  }
-};
 
 // Main Chart
-
-//Random Numbers
-function random(min, max) {
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
-
-var elements = 27;
-var data1 = [];
-var data2 = [];
-var data3 = [];
-
-for (var i = 0; i <= elements; i++) {
-  data1.push(random(50, 200));
-  data2.push(random(80, 100));
-  data3.push(random(65, 100));
-}
 
 class Dashboard extends Component {
   constructor(props) {
@@ -219,8 +40,452 @@ class Dashboard extends Component {
 
     this.state = {
       dropdownOpen: false,
-      radioSelected: 2
+      radioSelected: 2,
+      production: 0,
+      consumption: 0,
+      battery: 0,
+      cardChartData1: {},
+      cardChartOpts1: {},
+      cardChartData2: {},
+      cardChartOpts2: {},
+      cardChartData3: {},
+      cardChartOpts3: {}
     };
+  }
+
+  async componentWillMount() {
+    this.interval = setInterval(() => this.updateChart(), 60000);
+    myProduction = [];
+    myConsumption = [];
+    myBattery = [];
+    myLabels = [];
+    try {
+      const res = await api
+        .get(`energy/outputNow/5c9b6c0772cdd62e30853c16`)
+        .then(_ => {
+          myData = _.data;
+          for (var i = 0; i <= myData.length - 1; i = i + 10) {
+            myProduction.push(myData[i].totalProduction);
+            myConsumption.push(myData[i].totalConsumption);
+            myBattery.push(myData[i].batteryLevel);
+            let date = new Date(myData[i].date);
+            myLabels.push(date.getHours() + ":" + date.getMinutes());
+          }
+          // UPDATE CHARTS
+
+          // Card Chart 1
+          this.state.cardChartData1 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Consumption",
+                backgroundColor: brandPrimary,
+                borderColor: "rgba(255,255,255,.55)",
+                data: myConsumption
+              }
+            ]
+          };
+
+          this.state.cardChartOpts1 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  gridLines: {
+                    color: "transparent",
+                    zeroLineColor: "transparent"
+                  },
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: "transparent"
+                  }
+                }
+              ],
+              yAxes: [
+                {
+                  display: false,
+                  ticks: {
+                    display: false,
+                    min:
+                      Math.min.apply(
+                        Math,
+                        this.state.cardChartData1.datasets[0].data
+                      ) - 5,
+                    max:
+                      Math.max.apply(
+                        Math,
+                        this.state.cardChartData1.datasets[0].data
+                      ) + 5
+                  }
+                }
+              ]
+            },
+            elements: {
+              line: {
+                borderWidth: 1
+              },
+              point: {
+                radius: 0,
+                hitRadius: 2,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // Card Chart 2
+          this.state.cardChartData2 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Production",
+                backgroundColor: brandInfo,
+                borderColor: "rgba(255,255,255,.55)",
+                data: myProduction
+              }
+            ]
+          };
+
+          this.state.cardChartOpts2 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  gridLines: {
+                    color: "transparent",
+                    zeroLineColor: "transparent"
+                  },
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: "transparent"
+                  }
+                }
+              ],
+              yAxes: [
+                {
+                  display: false,
+                  ticks: {
+                    display: false,
+                    min:
+                      Math.min.apply(
+                        Math,
+                        this.state.cardChartData2.datasets[0].data
+                      ) - 5,
+                    max:
+                      Math.max.apply(
+                        Math,
+                        this.state.cardChartData2.datasets[0].data
+                      ) + 50
+                  }
+                }
+              ]
+            },
+            elements: {
+              line: {
+                tension: 0.00001,
+                borderWidth: 1
+              },
+              point: {
+                radius: 0,
+                hitRadius: 2,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // Card Chart 3
+          this.state.cardChartData3 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Battery Level",
+                backgroundColor: "rgba(255,255,255,.2)",
+                borderColor: "rgba(255,255,255,.55)",
+                data: myBattery
+              }
+            ]
+          };
+
+          this.state.cardChartOpts3 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: false
+                }
+              ],
+              yAxes: [
+                {
+                  display: false
+                }
+              ]
+            },
+            elements: {
+              line: {
+                borderWidth: 2
+              },
+              point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // UPDATE CHARTS
+          // Change states
+          let calculate = data => data.reduce((a, b) => a + b, 0);
+          this.state.production = (calculate(myProduction) / 100).toFixed(3);
+          this.state.consumption = (calculate(myConsumption) / 100).toFixed(3);
+          this.state.battery = (myBattery[myBattery.length - 1] / 100).toFixed(
+            3
+          );
+          // Change states
+        });
+      if (res.data) {
+        console.log("Got data!");
+        console.log(res.data);
+      }
+    } catch (error) {
+      this.setState({ errorMsg: "Error !", visible: true });
+    }
+  }
+
+  async updateChart() {
+    myProduction = [];
+    myConsumption = [];
+    myBattery = [];
+    myLabels = [];
+    try {
+      const res = await api
+        .get(`energy/outputNow/5c9b6c0772cdd62e30853c16`)
+        .then(_ => {
+          myData = _.data;
+          for (var i = 0; i <= myData.length - 1; i = i + 10) {
+            myProduction.push(myData[i].totalProduction);
+            myConsumption.push(myData[i].totalConsumption);
+            myBattery.push(myData[i].batteryLevel);
+            let date = new Date(myData[i].date);
+            myLabels.push(date.getHours() + ":" + date.getMinutes());
+          }
+          // UPDATE CHARTS
+
+          // Card Chart 1
+          this.state.cardChartData1 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Consumption",
+                backgroundColor: brandPrimary,
+                borderColor: "rgba(255,255,255,.55)",
+                data: myConsumption
+              }
+            ]
+          };
+
+          this.state.cardChartOpts1 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  gridLines: {
+                    color: "transparent",
+                    zeroLineColor: "transparent"
+                  },
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: "transparent"
+                  }
+                }
+              ],
+              yAxes: [
+                {
+                  display: false,
+                  ticks: {
+                    display: false,
+                    min:
+                      Math.min.apply(
+                        Math,
+                        this.state.cardChartData1.datasets[0].data
+                      ) - 5,
+                    max:
+                      Math.max.apply(
+                        Math,
+                        this.state.cardChartData1.datasets[0].data
+                      ) + 5
+                  }
+                }
+              ]
+            },
+            elements: {
+              line: {
+                borderWidth: 1
+              },
+              point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // Card Chart 2
+          this.state.cardChartData2 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Production",
+                backgroundColor: brandInfo,
+                borderColor: "rgba(255,255,255,.55)",
+                data: myProduction
+              }
+            ]
+          };
+
+          this.state.cardChartOpts2 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  gridLines: {
+                    color: "transparent",
+                    zeroLineColor: "transparent"
+                  },
+                  ticks: {
+                    fontSize: 2,
+                    fontColor: "transparent"
+                  }
+                }
+              ],
+              yAxes: [
+                {
+                  display: false,
+                  ticks: {
+                    display: false,
+                    min:
+                      Math.min.apply(
+                        Math,
+                        this.state.cardChartData2.datasets[0].data
+                      ) - 5,
+                    max:
+                      Math.max.apply(
+                        Math,
+                        this.state.cardChartData2.datasets[0].data
+                      ) + 50
+                  }
+                }
+              ]
+            },
+            elements: {
+              line: {
+                tension: 0.00001,
+                borderWidth: 1
+              },
+              point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // Card Chart 3
+          this.state.cardChartData3 = {
+            labels: myLabels,
+            datasets: [
+              {
+                label: "Battery Level",
+                backgroundColor: "rgba(255,255,255,.2)",
+                borderColor: "rgba(255,255,255,.55)",
+                data: myBattery
+              }
+            ]
+          };
+
+          this.state.cardChartOpts3 = {
+            tooltips: {
+              enabled: false,
+              custom: CustomTooltips
+            },
+            maintainAspectRatio: false,
+            legend: {
+              display: false
+            },
+            scales: {
+              xAxes: [
+                {
+                  display: false
+                }
+              ],
+              yAxes: [
+                {
+                  display: false
+                }
+              ]
+            },
+            elements: {
+              line: {
+                borderWidth: 2
+              },
+              point: {
+                radius: 0,
+                hitRadius: 10,
+                hoverRadius: 4
+              }
+            }
+          };
+
+          // UPDATE CHARTS
+          // Change states
+          let calculate = data => data.reduce((a, b) => a + b, 0);
+          this.state.production = (calculate(myProduction) / 100).toFixed(3);
+          this.state.consumption = (calculate(myConsumption) / 100).toFixed(3);
+          this.state.battery = (myBattery[myBattery.length - 1] / 100).toFixed(
+            3
+          );
+          // Change states
+        });
+      if (res.data) {
+        console.log("Got data!");
+        console.log(res.data);
+      }
+    } catch (error) {
+      this.setState({ errorMsg: "Error !", visible: true });
+    }
   }
 
   toggle() {
@@ -267,14 +532,15 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </ButtonDropdown>
                 </ButtonGroup>
-                <div className="text-value">9.823</div>
+                <div className="text-value">{this.state.consumption}</div>
                 <div>Energy Consumption</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: "70px" }}>
                 <Line
-                  data={cardChartData2}
-                  options={cardChartOpts2}
+                  data={this.state.cardChartData1}
+                  options={this.state.cardChartOpts1}
                   height={70}
+                  redraw="true"
                 />
               </div>
             </Card>
@@ -303,14 +569,15 @@ class Dashboard extends Component {
                   </ButtonDropdown>
                 </ButtonGroup>
 
-                <div className="text-value">9.823</div>
+                <div className="text-value">{this.state.production}</div>
                 <div>Energy Production</div>
               </CardBody>
               <div className="chart-wrapper mx-3" style={{ height: "70px" }}>
                 <Line
-                  data={cardChartData1}
-                  options={cardChartOpts1}
+                  data={this.state.cardChartData2}
+                  options={this.state.cardChartOpts2}
                   height={70}
+                  redraw="true"
                 />
               </div>
             </Card>
@@ -337,14 +604,15 @@ class Dashboard extends Component {
                     </DropdownMenu>
                   </Dropdown>
                 </ButtonGroup>
-                <div className="text-value">9.823</div>
-                <div>Energy Ratio</div>
+                <div className="text-value">{this.state.battery}</div>
+                <div>Battery Level</div>
               </CardBody>
               <div className="chart-wrapper" style={{ height: "70px" }}>
                 <Line
-                  data={cardChartData3}
-                  options={cardChartOpts3}
+                  data={this.state.cardChartData3}
+                  options={this.state.cardChartOpts3}
                   height={70}
+                  redraw="true"
                 />
               </div>
             </Card>
