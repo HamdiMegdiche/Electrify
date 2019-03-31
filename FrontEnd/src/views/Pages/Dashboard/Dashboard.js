@@ -540,7 +540,7 @@ class Dashboard extends Component {
                   data={this.state.cardChartData1}
                   options={this.state.cardChartOpts1}
                   height={70}
-                  redraw="true"
+                  redraw={true}
                 />
               </div>
             </Card>
@@ -577,7 +577,7 @@ class Dashboard extends Component {
                   data={this.state.cardChartData2}
                   options={this.state.cardChartOpts2}
                   height={70}
-                  redraw="true"
+                  redraw={true}
                 />
               </div>
             </Card>
@@ -612,7 +612,7 @@ class Dashboard extends Component {
                   data={this.state.cardChartData3}
                   options={this.state.cardChartOpts3}
                   height={70}
-                  redraw="true"
+                  redraw={true}
                 />
               </div>
             </Card>
