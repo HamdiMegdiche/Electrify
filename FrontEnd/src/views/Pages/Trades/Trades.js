@@ -15,7 +15,6 @@ import {
 import { Link } from "react-router-dom";
 import getContract from "../../../utils/getContract";
 
-
 export default class Trades extends Component {
   constructor(props) {
     super(props);
@@ -23,26 +22,39 @@ export default class Trades extends Component {
   }
 
   async componentDidMount() {
+    const ether = 1000000000000000000;
+
     try {
-      const res = "";
-        const user = JSON.parse(localStorage.getItem("user"));
-        this.setState({ transactions: [], user });
-        const { contract, web3 } = await getContract();
+      const user = JSON.parse(localStorage.getItem("user"));
 
-        contract.events.message({ fromBlock: 0, toBlock: "latest" }, (error, event) => { console.log(event); })
-        .on('data', (event) => {
-            console.log(event); // same results as the optional callback above
-        })
-        .on('changed', (event) => {
-            // remove event from local database
-        })
-        .on('error', console.error);
+      const { contract } = await getContract();
 
+      const nbrTrans = await contract.methods.transCount().call();
+
+      const transactions = [];
+
+      for (let i = 0; i < nbrTrans; i++) {
+        const tr = await contract.methods.transactions(i).call();
+
+        const trans = {
+          from: tr[0],
+          to: tr[1],
+          unitPrice: tr[2]/ ether,
+          quantity: tr[3] / 1000,
+          date: new Date(tr[4]*1000).toLocaleString()
+        };
+        transactions.push(trans);
+      }
+
+      this.setState({ transactions, user });
     } catch (error) {
       console.error(error);
     }
   }
-
+  toMyTransactions(){
+    // eslint-disable-next-line no-restricted-globals
+    location.href = "/trades/my-trades";
+  }
   render() {
     return (
       <div className="animated fadeIn">
@@ -50,9 +62,9 @@ export default class Trades extends Component {
           <Col>
             <Card>
               <CardHeader>
-                <i className="cui-cart" /> Trades
+                <i className="cui-cart" /> All transactions made on the blockchain
                 <Button
-                  onClick={this.handlerMyOffers}
+                  onClick={this.toMyTransactions}
                   className="float-right ml-2 mr-2"
                   color="info"
                   outline
@@ -81,24 +93,18 @@ export default class Trades extends Component {
                   <tbody>
                     {this.state.transactions.map((value, idx) => {
                       return (
-                        <tr key={value._id}>
+                        <tr key={idx}>
                           <td className="align-middle">
                             <Link to={`/users/${value.from}`}>
-                              {value.from}
+                              {value.from.substr(0, 30) + "..."}
                             </Link>
                           </td>
                           <td className="align-middle">
-                            <Link to={`/users/${value.to}`}>
-                              {value.to}
-                            </Link>
+                            <Link to={`/users/${value.to}`}>{value.to.substr(0, 30) + "..."}</Link>
                           </td>
-                          <td className="align-middle">
-                            {value.quantity / 1000}
-                          </td>
+                          <td className="align-middle">{value.quantity}</td>
                           <td className="align-middle">{value.unitPrice}</td>
-                          <td className="align-middle">
-                            {new Date(value.createdAt).toLocaleString()}
-                          </td>
+                          <td className="align-middle">{value.date}</td>
                         </tr>
                       );
                     })}

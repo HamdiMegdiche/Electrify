@@ -12,58 +12,51 @@ import {
   Table,
   Button
 } from "reactstrap";
-import api from "../../../api";
+import { Link } from "react-router-dom";
+import getContract from "../../../utils/getContract";
 
-export default class Offers extends Component {
+export default class MyTrades extends Component {
   constructor(props) {
     super(props);
-    this.handlerDeleteAll = this.handlerDeleteAll.bind(this);
-    this.state = { offers: [] };
+    this.state = { transactions: [], user: null };
   }
 
   async componentDidMount() {
+    const ether = 1000000000000000000;
+
     try {
       const user = JSON.parse(localStorage.getItem("user"));
-      const body = {
-        from: user.walletAddress
-      };
 
-      const res = await api.post(`offers/`, body);
-      if (res.data) {
-        const offers = res.data;
+      const { contract } = await getContract();
 
-        this.setState({ offers });
-      } else {
-        this.props.history.push("/404");
+      const nbrTrans = await contract.methods.transCount().call();
+
+      const transactions = [];
+
+      for (let i = 0; i < nbrTrans; i++) {
+        const tr = await contract.methods.transactions(i).call();
+
+        const trans = {
+          from: tr[0],
+          to: tr[1],
+          unitPrice: tr[2]/ ether,
+          quantity: tr[3] / 1000,
+          date: new Date(tr[4]*1000).toLocaleString()
+        };
+        if(trans.from === user.walletAddress)
+          transactions.push(trans);
       }
+
+      this.setState({ transactions, user });
     } catch (error) {
       console.error(error);
     }
   }
 
-  handlerDeleteOne = async (e, offer, index) => {
-    e.preventDefault();
-    try {
-      await api.delete(`offers/${offer._id}`);
-
-      let offers = this.state.offers;
-      offers.splice(index, 1);
-      this.setState({ offers });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  handlerDeleteAll = async () => {
-    try {
-      const body = { from: JSON.parse(localStorage.getItem("user")).walletAddress };
-
-      await api.post(`offers/delete`,body);
-
-      this.setState({ offers: [] });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  toAllTransactions(){
+     // eslint-disable-next-line no-restricted-globals
+     location.href = "/trades";
+  }
 
   render() {
     return (
@@ -72,60 +65,43 @@ export default class Offers extends Component {
           <Col>
             <Card>
               <CardHeader>
-                <i className="cui-cart" /> My Offers
+                <i className="cui-cart" /> All My transactions made on the blockchain
                 <Button
-                  onClick={this.handlerDeleteAll}
-                  className="float-right"
-                  color="danger"
+                  onClick={this.toAllTransactions}
+                  className="float-right ml-2 mr-2"
+                  color="info"
+                  outline
                 >
-                  &nbsp;Delete All
+                  <i className="fa fa-plus" />
+                  &nbsp;All Transactions
                 </Button>
               </CardHeader>
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    {this.state.offers.length > 0 ? (
+                    {this.state.transactions.length > 0 ? (
                       <tr>
-                        <th>Offer Id</th>
+                        <th>To</th>
                         <th>Energy (kwh)</th>
                         <th>Price (Ether)</th>
-                        <th>Date Posted</th>
-                        <th>Status</th>
-                        <th>Action</th>
+                        <th>Purshase date</th>
                       </tr>
                     ) : (
                       <tr>
-                        <th>You didn't make any offer yet.</th>
+                        <th>There are no transactions yet.</th>
                       </tr>
                     )}
                   </thead>
                   <tbody>
-                    {this.state.offers.map((value, idx) => {
+                    {this.state.transactions.map((value, idx) => {
                       return (
-                        <tr key={value._id}>
-                          <td className="align-middle">{value._id}</td>
+                        <tr key={idx}>
                           <td className="align-middle">
-                            {value.quantity / 1000}
+                            <Link to={`/users/${value.to}`}>{value.to}</Link>
                           </td>
+                          <td className="align-middle">{value.quantity}</td>
                           <td className="align-middle">{value.unitPrice}</td>
-                          <td className="align-middle">
-                            {new Date(value.createdAt).toLocaleString()}
-                          </td>
-                          <td className="align-middle">
-                            <Badge color="success">{value.status}</Badge>
-                          </td>
-                          <td className="align-middle">
-                            <Button
-                              color="danger"
-                              outline
-                              onClick={e =>
-                                this.handlerDeleteOne(e, value, idx)
-                              }
-                            >
-                              <i className="cui-trash" />
-                              &nbsp;Delete
-                            </Button>
-                          </td>
+                          <td className="align-middle">{value.date}</td>
                         </tr>
                       );
                     })}

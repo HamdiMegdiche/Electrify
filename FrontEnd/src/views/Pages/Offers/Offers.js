@@ -33,64 +33,81 @@ export default class Offers extends Component {
     this.props.history.push("/offers/my-offers");
   };
 
-  async makeTransaction(offer) {
-    const ether = 1000000000000000000;
-
-    const { contract, web3 } = await getContract();
-    const [account] = await web3.eth.getAccounts();
-
-    web3.eth.defaultAccount = account;
-    var response = await contract.methods
-      .makeTransaction(offer.walletAddress, offer.quantity)
-      .send({
-        value: (offer.quantity / 1000) * offer.unitPrice * ether
-      });
-    return response;
-  }
-
   buyNow = async (e, offer) => {
     e.preventDefault();
     const ether = 1000000000000000000;
 
-    console.log(
-      "offer total price: " + (offer.quantity / 1000) * offer.unitPrice
-    );
-
-    console.log("wallet: " + offer.walletAddress);
-
-
-
     try {
       var response = await this.state.contract.methods
-      .makeTransaction(offer.walletAddress, offer.quantity)
-      .send({
-
-        value: (offer.quantity / 1000) * offer.unitPrice * ether
-      });
+        .makeTransaction(offer.from, offer.quantity)
+        .send({
+          value: (offer.quantity / 1000) * offer.unitPrice * ether
+        });
 
       console.log(response);
+      console.log("after transaction");
+
+
+      await api.post(`offers/confirm/${offer._id}`);
+      await this.updateOffersState();
     } catch (err) {
+      await api.post(`offers/confirm/${offer._id}`);
+      await this.updateOffersState();
       console.log(err);
     }
   };
 
+  async updateOffersState() {
+    try {
+      const res = await api.get(`offers/`);
+      if (res.data) {
+        this.setState({ offers: res.data });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
   async componentDidMount() {
     try {
       const { contract, web3 } = await getContract();
       const [account] = await web3.eth.getAccounts();
 
       web3.eth.defaultAccount = account;
-      console.log(web3);
-      const res = await api.get(`offers/`);
 
-      if (res.data) {
-        const offers = res.data;
-        const user = JSON.parse(localStorage.getItem("user"));
+      // const event = contract.message({ fromBlock: 0, toBlock: "latest" });
+      // event.watch((error, result) => {
+      //   if (!error)
+      //     console.log("eveeeeeeeeeent");
 
-        this.setState({ offers, user,contract, web3 });
-      } else {
-        this.props.history.push("/404");
-      }
+      // })
+
+      // contract.events.message({ fromBlock: 0, toBlock: "latest" })
+      // .on('data', (event) => {
+      //     console.log("eveeeeent"); // same results as the optional callback above
+      // })
+
+      // contract.getPastEvents(
+      //   "message",
+      //   { fromBlock: 0, toBlock: "latest" },
+      //   (error, event) => {
+      //     console.log(event.length);
+      //   }
+      // );
+
+      // contract.events.message({ fromBlock: 0, toBlock: "latest" }, (error, event) => { console.log(event); })
+      // .on('data', (event) => {
+      //     console.log(event); // same results as the optional callback above
+      // })
+      // .on('changed', (event) => {
+      //     // remove event from local database
+      // })
+      // .on('error', console.error);
+
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      this.setState({ user, contract, web3 });
+
+      await this.updateOffersState();
     } catch (error) {
       console.error(error);
     }
@@ -147,7 +164,7 @@ export default class Offers extends Component {
                         <tr key={value._id}>
                           <td className="align-middle">
                             <Link to={`/users/${value.from}`}>
-                              {value.from}
+                              {value.from.substr(0, 30) + "..."}
                             </Link>
                           </td>
                           <td className="align-middle">
@@ -160,14 +177,21 @@ export default class Offers extends Component {
                             {new Date(value.createdAt).toLocaleString()}
                           </td>
                           <td className="align-middle">
-                            <Badge color="success">{value.status}</Badge>
+                            {value.status === "Pending" ? (
+                              <Badge color="success">{value.status}</Badge>
+                            ) : (
+                              <Badge color="danger">{value.status}</Badge>
+                            )}
                           </td>
                           <td className="align-middle">
                             <Button
                               color="danger"
                               onClick={e => this.buyNow(e, value)}
                               outline
-                              disabled={this.state.user.id === value.from}
+                              disabled={
+                                this.state.user.walletAddress === value.from ||
+                                value.status === "Passed"
+                              }
                             >
                               <i className="cui-credit-card" />
                               &nbsp;Buy Now

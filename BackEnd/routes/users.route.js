@@ -12,23 +12,6 @@ const {UserModel} = require('../models');
 const validateRegisterInput = require('../validation/register');
 const validateLoginInput = require('../validation/login');
 
-//just for testing performance
-router.post('/test', async (req, res) => {
-  for (let i = 101; i <= 201; i++) {
-    let user = new UserModel({
-      username: `user${i}`,
-      email: `user${i}@outlook.fr`,
-      password: 'test'
-    });
-    // console.log('Try to create user'+i);
-    await user.save(err => {
-      if (err) res.send(err);
-    });
-    // console.log('created user'+i);
-  }
-  return res.sendStatus(200);
-});
-
 // get all users
 router.get('/', (req, res) => {
   UserModel.find((err, users) => {
@@ -48,7 +31,7 @@ router.post('/register', (req, res) => {
   if (!isValid) {
     return res.status(400).json(errors);
   }
-  const { username, password, email } = req.body;
+  const { username, password, email,walletAddress } = req.body;
 
   UserModel.findOne({ username }).then(user => {
     if (user) {
@@ -62,6 +45,7 @@ router.post('/register', (req, res) => {
       email,
       avatar,
       password,
+      walletAddress,
       smartHubId: "123456789"
     });
 
@@ -106,14 +90,14 @@ router.post('/login', (req, res) => {
         // User Matched
         const payload = { id: user.id, name: user.username, avatar: user.avatar }; // Create JWT Payload
 
-        const {id, username , email, avatar, createdAt , smartHubId} = user;
+        const {id, username , email, avatar, createdAt , smartHubId, walletAddress} = user;
         // Sign Token
         jwt.sign(payload, keys.TOKEN_KEY, { expiresIn: "2 days" }, (err, token) => {
          return res.json({
             success: true,
             token,
             user: {
-              id, username , email, avatar, createdAt , smartHubId
+              id, username , email, avatar, createdAt , smartHubId,walletAddress
             }
           });
         });
@@ -127,6 +111,15 @@ router.post('/login', (req, res) => {
 // get user by id
 router.get('/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
   UserModel.findById(req.params.id, (err, user) => {
+    if (err) console.log(err);
+
+    return res.json(user);
+  });
+});
+
+// get user by id
+router.get('/wallet/:id', passport.authenticate('jwt', { session: false }), (req, res) => {
+  UserModel.findOne({walletAddress: req.params.id}, (err, user) => {
     if (err) console.log(err);
 
     return res.json(user);
@@ -147,9 +140,9 @@ router.post('/update/:id', passport.authenticate('jwt', { session: false }), fun
     doc.save((err, doc) => {
       if (err) res.send(err);
       else {
-        const {id, username , email, avatar, createdAt} = doc;
+        const {id, username , email, avatar, createdAt, walletAddress} = doc;
 
-        res.send({id, username , email, avatar, createdAt});}
+        res.send({id, username , email, avatar, createdAt, walletAddress});}
     });
   });
 });

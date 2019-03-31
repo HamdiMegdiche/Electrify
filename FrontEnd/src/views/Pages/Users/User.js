@@ -10,21 +10,49 @@ class User extends Component {
       username: "",
       email: "",
       createdAt: "",
-      smartHubId: ""
+      smartHubId: "",
+      walletAddress: ""
     };
   }
+
+  //   async setBalanceState() {
+  //     const { web3 } = await getContract();
+  //     const { walletAddress } = JSON.parse(localStorage.getItem("user"));
+  //     const balance = await web3.eth.getBalance(walletAddress);
+
+  //     console.log(balance);
+  //     web3.eth.getBalance("0xB293917D2292C80352F5bF98Fc7AE08E7b6D081D")
+  // .then(console.log);
+  //     this.setState({ balance });
+  //   }
+
   async componentDidMount() {
     try {
-      const res = await api.get(`user/${this.props.match.params.id}`, {
+      const res = await api.get(`user/wallet/${this.props.match.params.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
       if (res.data) {
-        let { _id: id, username, email, createdAt ,smartHubId} = res.data;
+        let {
+          _id: id,
+          username,
+          email,
+          createdAt,
+          smartHubId,
+          walletAddress
+        } = res.data;
         createdAt = new Date(createdAt).toLocaleString();
-        this.setState({ id, username, email, createdAt ,smartHubId});
-      }else{
-        this.props.history.push("/404");
 
+        this.setState({
+          id,
+          username,
+          email,
+          createdAt,
+          smartHubId,
+          walletAddress
+        });
+
+      } else {
+        this.props.history.push("/404");
       }
     } catch (error) {
       console.log(error);
@@ -32,7 +60,6 @@ class User extends Component {
     }
   }
   render() {
-
     return (
       <div className="animated fadeIn">
         <Row>
@@ -41,17 +68,22 @@ class User extends Component {
               <CardHeader>
                 <strong>
                   <i className="icon-info pr-1" />
-                  User id: {this.props.match.params.id}
+                  User id: {this.state.id}
                 </strong>
               </CardHeader>
               <CardBody>
                 <Table responsive striped hover>
                   <tbody>
-
                     <tr key="Id">
                       <td>{`ID :`}</td>
                       <td>
                         <strong>{this.state.id}</strong>
+                      </td>
+                    </tr>
+                    <tr key="walet">
+                      <td>{`Wallet address :`}</td>
+                      <td>
+                        <strong>{this.state.walletAddress}</strong>
                       </td>
                     </tr>
                     <tr key="Idsamrthub">
@@ -78,7 +110,6 @@ class User extends Component {
                         <strong>{this.state.createdAt}</strong>
                       </td>
                     </tr>
-
                   </tbody>
                 </Table>
               </CardBody>

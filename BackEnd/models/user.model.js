@@ -23,6 +23,9 @@ const UserSchema = new mongoose.Schema(
     },
     smartHubId: {
       type: String
+    },
+    walletAddress: {
+      type: String
     }
   },
   {

@@ -17,7 +17,6 @@ import {
 } from "reactstrap";
 import api from "../../../api";
 import { Alert } from "reactstrap";
-import getContract from "../../../utils/getContract";
 
 export default class OfferForm extends Component {
   constructor(props) {
@@ -33,8 +32,7 @@ export default class OfferForm extends Component {
       visible: false,
       quantity: 2000,
       unitPrice: 1,
-      total: 2,
-      account: ""
+      total: 2
     };
   }
 
@@ -50,20 +48,6 @@ export default class OfferForm extends Component {
     this.setState(prevState => {
       return { fadeIn: !prevState };
     });
-  }
-
-  async componentDidMount() {
-    try {
-      const { web3 } = await getContract();
-      const [account] = await web3.eth.getAccounts();
-      this.setState({ account });
-    } catch (error) {
-      this.setState({
-        errorMsg:
-          "Please make sure that you are connected to your wallet MetaMask",
-        visible: true
-      });
-    }
   }
 
   handleChange = event => {
@@ -108,15 +92,20 @@ export default class OfferForm extends Component {
         errorMsg: "Quantity must be an integer greater than 0",
         visible: true
       });
-    if (this.state.account.length <= 0)
-      // eslint-disable-next-line no-restricted-globals
-      location.reload();
+
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user.walletAddress.length <= 0)
+      return this.setState({
+        errorMsg:
+          "Please verify that you are connected to your MetaMask wallet",
+        visible: true
+      });
+
     try {
       let body = {
-        from: JSON.parse(localStorage.getItem("user")).id,
+        from: user.walletAddress,
         unitPrice: this.state.unitPrice,
-        quantity: this.state.quantity,
-        walletAddress: this.state.account
+        quantity: this.state.quantity
       };
 
       const res = await api.post(`offers/create`, JSON.stringify(body));

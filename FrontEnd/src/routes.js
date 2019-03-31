@@ -4,8 +4,9 @@ import DefaultLayout from "./containers/DefaultLayout";
 const Dashboard = React.lazy(() => import("./views/Pages/Dashboard/Dashboard"));
 const Users = React.lazy(() => import("./views/Pages/Users/Users"));
 const User = React.lazy(() => import("./views/Pages/Users/User"));
-const Trades = React.lazy(() => import("./views/Pages/Trades/Trades"));
 const Offers = React.lazy(() => import("./views/Pages/Offers/Offers"));
+const Trades = React.lazy(() => import("./views/Pages/Trades/Trades"));
+const MyTrades = React.lazy(() => import("./views/Pages/Trades/MyTrades"));
 const OfferForm = React.lazy(() => import("./views/Pages/Offers/OfferForm"));
 const MyOffers = React.lazy(() => import("./views/Pages/Offers/MyOffers"));
 const Settings = React.lazy(() => import("./views/Pages/Settings/Settings"));
@@ -23,6 +24,7 @@ const routes = [
   { path: "/", exact: true, name: "Home", component: DefaultLayout },
   { path: "/dashboard", exact: true, name: "Dashboard", component: Dashboard },
   { path: "/trades", exact: true, name: "Trades", component: Trades },
+  { path: "/trades/my-trades", exact: true, name: "MyTrades", component: MyTrades },
   { path: "/offers", exact: true, name: "Offers", component: Offers },
   {
     path: "/offers/make-offer",

@@ -37,7 +37,8 @@ class DefaultHeader extends Component {
     this.state = {
       id: "",
       avatar: "../../assets/img/avatars/1.jpg",
-      email: ""
+      email: "",
+      walletAddress: ""
     };
   }
 
@@ -45,10 +46,11 @@ class DefaultHeader extends Component {
     let user = localStorage.getItem("user");
 
     if (user) {
-      const { id, avatar, email } = JSON.parse(user);
-      this.setState({ id, avatar, email });
+      const { id, avatar, email, walletAddress } = JSON.parse(user);
+      this.setState({ id, avatar, email, walletAddress });
     }
   }
+
 
   render() {
     return (
@@ -71,7 +73,7 @@ class DefaultHeader extends Component {
               Trades
             </Link>
           </NavItem>
-          <NavItem className="px-3">
+          <NavItem className="px-3" onClick={this.reload}>
             <Link to="/offers" className="nav-link">
               Offers
             </Link>
@@ -113,13 +115,13 @@ class DefaultHeader extends Component {
               </DropdownItem>
               <DropdownItem>
                 <i className="fa fa-user" />{" "}
-                <Link to={`/users/${this.state.id}`} style={Style}>
+                <Link to={`/users/${this.state.walletAddress}`} style={Style}>
                   Profile
                 </Link>
               </DropdownItem>
               <DropdownItem>
                 <i className="fa fa-wrench" />{" "}
-                <Link to={`/users/${this.state.id}`} style={Style}>
+                <Link to={`/users/${this.state.walletAddress}`} style={Style}>
                   Settings
                 </Link>
               </DropdownItem>

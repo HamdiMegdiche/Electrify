@@ -30,6 +30,7 @@ const Page404 = Loadable({
 
 class App extends Component {
 
+
   render() {
     return (
       <BrowserRouter>

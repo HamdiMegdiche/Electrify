@@ -5,13 +5,31 @@ const passport = require('passport');
 const { OfferModel } = require('../models');
 
 router.post('/create', passport.authenticate('jwt', {  session: false}), (req, res) => {
-  const { from, unitPrice, quantity, walletAddress } = req.body;
+  const { from, unitPrice, quantity } = req.body;
   const newOffer = new OfferModel({
-    from, unitPrice, quantity, walletAddress
+    from, unitPrice, quantity
   });
 
   newOffer.save().then(offer => res.json(offer))
   .catch(err => console.log(err));
+
+});
+
+router.post('/confirm/:id', passport.authenticate('jwt', {  session: false}), (req, res) => {
+  OfferModel.findById(req.params.id, (err, doc) => {
+    if (err)  {
+      console.log(err);
+    }
+    else{
+      doc.status = "Passed";
+      doc.save((err, doc) => {
+        if (err) 
+          return res.send(err);
+      
+        return res.sendStatus(200);
+      });
+    }    
+  });
 
 });
 

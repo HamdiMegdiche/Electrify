@@ -31,7 +31,10 @@ contract Electrify {
     // send an amount of ether from the user that called this function to an address
     function makeTransaction(address payable to, uint quantity) public payable returns(bool) {
      require(msg.sender.balance >= msg.value && msg.value > 0.0001 ether);
-     to.transfer(msg.value);
+
+     emit message("new trans");
+
+
      Transaction memory trans = Transaction({
          from: msg.sender,
          to: to,
@@ -40,7 +43,8 @@ contract Electrify {
          timestamp: now});
      transactions.push(trans);
      transCount++;
-     emit message("new trans");
+
+     to.transfer(msg.value);
 
      return true;
 
