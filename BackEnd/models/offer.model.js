@@ -5,6 +5,10 @@ const OfferSchema = new mongoose.Schema({
     type: String,
     required: [true, "can't be blank"],
   },
+  walletAddress: {
+    type: String,
+    required: [true, "can't be blank"],
+  },
   quantity: {
     type: Number,
     required: [true, "can't be blank"],

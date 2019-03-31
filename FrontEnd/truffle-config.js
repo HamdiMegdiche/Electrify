@@ -7,14 +7,14 @@ module.exports = {
   networks: {
     development: {
       host: "127.0.0.1",
-      port: 7545,
+      port: 8501 ,
       network_id: "*",
     }
   }
-  // ,
+  ,
   // compilers: {
   //   solc: {
-  //     version: "=0.5.6"
+  //     version: "0.4.19+commit.c4cbbb05.Emscripten.clang"
   //   }
   // }
 };

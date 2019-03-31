@@ -15,6 +15,7 @@ import {
 import { Link } from "react-router-dom";
 
 import api from "../../../api";
+import getContract from "../../../utils/getContract";
 
 export default class Offers extends Component {
   constructor(props) {
@@ -22,7 +23,7 @@ export default class Offers extends Component {
     this.handlerMakeOffer = this.handlerMakeOffer.bind(this);
     this.handlerMyOffers = this.handlerMyOffers.bind(this);
 
-    this.state = { offers: [], user: null };
+    this.state = { offers: [], user: null, contract: null, web3: null };
   }
 
   handlerMakeOffer = () => {
@@ -32,19 +33,61 @@ export default class Offers extends Component {
     this.props.history.push("/offers/my-offers");
   };
 
+  async makeTransaction(offer) {
+    const ether = 1000000000000000000;
+
+    const { contract, web3 } = await getContract();
+    const [account] = await web3.eth.getAccounts();
+
+    web3.eth.defaultAccount = account;
+    var response = await contract.methods
+      .makeTransaction(offer.walletAddress, offer.quantity)
+      .send({
+        value: (offer.quantity / 1000) * offer.unitPrice * ether
+      });
+    return response;
+  }
+
   buyNow = async (e, offer) => {
     e.preventDefault();
-    console.log("offer id: " + offer._id);
-    console.log("user id: " + this.state.user.id);
+    const ether = 1000000000000000000;
+
+    console.log(
+      "offer total price: " + (offer.quantity / 1000) * offer.unitPrice
+    );
+
+    console.log("wallet: " + offer.walletAddress);
+
+
+
+    try {
+      var response = await this.state.contract.methods
+      .makeTransaction(offer.walletAddress, offer.quantity)
+      .send({
+
+        value: (offer.quantity / 1000) * offer.unitPrice * ether
+      });
+
+      console.log(response);
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   async componentDidMount() {
     try {
+      const { contract, web3 } = await getContract();
+      const [account] = await web3.eth.getAccounts();
+
+      web3.eth.defaultAccount = account;
+      console.log(web3);
       const res = await api.get(`offers/`);
+
       if (res.data) {
         const offers = res.data;
         const user = JSON.parse(localStorage.getItem("user"));
-        this.setState({ offers, user });
+
+        this.setState({ offers, user,contract, web3 });
       } else {
         this.props.history.push("/404");
       }
@@ -87,7 +130,7 @@ export default class Offers extends Component {
                       <tr>
                         <th>From</th>
                         <th>Energy (kwh)</th>
-                        <th>Price (Ether)</th>
+                        <th>Total Price (Ether)</th>
                         <th>Date Posted</th>
                         <th>Status</th>
                         <th>Action</th>
@@ -110,7 +153,9 @@ export default class Offers extends Component {
                           <td className="align-middle">
                             {value.quantity / 1000}
                           </td>
-                          <td className="align-middle">{value.unitPrice}</td>
+                          <td className="align-middle">
+                            {(value.quantity / 1000) * value.unitPrice}
+                          </td>
                           <td className="align-middle">
                             {new Date(value.createdAt).toLocaleString()}
                           </td>

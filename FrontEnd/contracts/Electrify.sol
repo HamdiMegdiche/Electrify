@@ -1,10 +1,11 @@
 pragma solidity ^0.5.0;
-pragma experimental ABIEncoderV2;
+
 contract Electrify {
 
     // address of the person that made the deployment of this contract
     // perhaps the "admin" later
     address public owner;
+    uint public transCount = 0;
 
     struct User {
         uint weight;
@@ -15,15 +16,17 @@ contract Electrify {
         address from;
         address to;
         uint unitPrice; // price of 1KWh in ether
-        uint quantity;
+        uint quantity; // quantity in Whats
         uint timestamp;
     }
 
-    Transaction[] public transactions ;
+    Transaction [] public  transactions;
 
     constructor() public {
         owner = msg.sender;
     }
+
+    event message(string);
 
     // send an amount of ether from the user that called this function to an address
     function makeTransaction(address payable to, uint quantity) public payable returns(bool) {
@@ -36,13 +39,10 @@ contract Electrify {
          quantity: quantity,
          timestamp: now});
      transactions.push(trans);
+     transCount++;
+     emit message("new trans");
 
      return true;
 
     }
-
-    function getTransactions() public view returns(Transaction[]memory){
-        return transactions;
-    }
-
 }
