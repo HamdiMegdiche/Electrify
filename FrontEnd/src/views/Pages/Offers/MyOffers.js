@@ -55,9 +55,11 @@ export default class Offers extends Component {
   };
   handlerDeleteAll = async () => {
     try {
-      const body = { from: JSON.parse(localStorage.getItem("user")).walletAddress };
+      const body = {
+        from: JSON.parse(localStorage.getItem("user")).walletAddress
+      };
 
-      await api.post(`offers/delete`,body);
+      await api.post(`offers/delete`, body);
 
       this.setState({ offers: [] });
     } catch (error) {
@@ -111,9 +113,14 @@ export default class Offers extends Component {
                           <td className="align-middle">
                             {new Date(value.createdAt).toLocaleString()}
                           </td>
-                          <td className="align-middle">
-                            <Badge color="success">{value.status}</Badge>
+                          <td>
+                            {value.status === "Pending" ? (
+                              <Badge color="success">{value.status}</Badge>
+                            ) : (
+                              <Badge color="danger">{value.status}</Badge>
+                            )}
                           </td>
+
                           <td className="align-middle">
                             <Button
                               color="danger"
