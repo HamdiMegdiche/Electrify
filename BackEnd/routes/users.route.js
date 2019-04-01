@@ -92,7 +92,7 @@ router.post('/login', (req, res) => {
 
         const {id, username , email, avatar, createdAt , smartHubId, walletAddress} = user;
         // Sign Token
-        jwt.sign(payload, keys.TOKEN_KEY, { expiresIn: "2 days" }, (err, token) => {
+        jwt.sign(payload, keys.TOKEN_KEY, { expiresIn: "20 days" }, (err, token) => {
          return res.json({
             success: true,
             token,

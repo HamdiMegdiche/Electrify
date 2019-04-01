@@ -115,6 +115,9 @@ export default class OfferForm extends Component {
 
         this.setState({ id, username, email, createdAt });
         this.props.history.push("/offers/my-offers");
+
+        // eslint-disable-next-line no-restricted-globals
+        location.reload();
       } else {
         this.props.history.push("/404");
       }

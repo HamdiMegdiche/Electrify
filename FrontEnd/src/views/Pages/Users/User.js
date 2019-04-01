@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardHeader, Col, Row, Table } from "reactstrap";
 import api from "../../../api";
+import getContract from "../../../utils/getContract";
 
 class User extends Component {
   constructor(props) {
@@ -11,23 +12,23 @@ class User extends Component {
       email: "",
       createdAt: "",
       smartHubId: "",
-      walletAddress: ""
+      walletAddress: "",
+      balance: ""
     };
   }
 
-  //   async setBalanceState() {
-  //     const { web3 } = await getContract();
-  //     const { walletAddress } = JSON.parse(localStorage.getItem("user"));
-  //     const balance = await web3.eth.getBalance(walletAddress);
-
-  //     console.log(balance);
-  //     web3.eth.getBalance("0xB293917D2292C80352F5bF98Fc7AE08E7b6D081D")
-  // .then(console.log);
-  //     this.setState({ balance });
-  //   }
-
   async componentDidMount() {
     try {
+      const { web3 } = await getContract();
+      const { walletAddress } = JSON.parse(localStorage.getItem("user"));
+      const ether = 1000000000000000000;
+      let balance = 0;
+
+      web3.eth.getBalance(walletAddress, (err, _balance) => {
+        balance = _balance / ether;
+        this.setState({balance});
+      });
+
       const res = await api.get(`user/wallet/${this.props.match.params.id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       });
@@ -48,9 +49,9 @@ class User extends Component {
           email,
           createdAt,
           smartHubId,
-          walletAddress
+          walletAddress,
+          balance
         });
-
       } else {
         this.props.history.push("/404");
       }
@@ -108,6 +109,12 @@ class User extends Component {
                       <td>{`Registered At :`}</td>
                       <td>
                         <strong>{this.state.createdAt}</strong>
+                      </td>
+                    </tr>
+                    <tr key="bal">
+                      <td>{`Balance  :`}</td>
+                      <td>
+                        <strong>{this.state.balance} Ether</strong>
                       </td>
                     </tr>
                   </tbody>

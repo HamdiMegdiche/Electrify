@@ -13,6 +13,7 @@ import {
   Button
 } from "reactstrap";
 import api from "../../../api";
+import getContract from "../../../utils/getContract";
 
 export default class Offers extends Component {
   constructor(props) {
@@ -22,22 +23,48 @@ export default class Offers extends Component {
   }
 
   async componentDidMount() {
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    // listen to blockchian events
     try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const body = {
-        from: user.walletAddress
-      };
+      const { contract } = await getContract();
 
-      const res = await api.post(`offers/`, body);
-      if (res.data) {
-        const offers = res.data;
+      await this.updateOffersState(user.walletAddress);
 
-        this.setState({ offers });
-      } else {
-        this.props.history.push("/404");
-      }
+      contract.events
+        .message()
+        .on("data", async event => {
+          const trans = {
+            from: event.returnValues[0],
+            to: event.returnValues[1]
+          };
+
+          if (
+            trans.to === user.walletAddress ||
+            trans.from === user.walletAddress
+          ) {
+            await this.updateOffersState();
+
+            // eslint-disable-next-line no-restricted-globals
+            location.reload();
+
+            console.log("socket my offers : trnsaction confrimed !");
+          }
+        })
+        .on("error", console.error);
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  async updateOffersState(walletAddress) {
+    try {
+      const res = await api.get(`offers/from/${walletAddress}`);
+      if (res.data) {
+        this.setState({ offers: res.data });
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 

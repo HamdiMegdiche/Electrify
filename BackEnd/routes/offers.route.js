@@ -33,9 +33,9 @@ router.post('/confirm/:id', passport.authenticate('jwt', {  session: false}), (r
 
 });
 
-// get offers by from id
-router.post('/', passport.authenticate('jwt', {  session: false}), (req, res) => {
-  const { from } = req.body;
+// get offers by from wallet address
+router.get('/from/:id', passport.authenticate('jwt', {  session: false}), (req, res) => {
+  const from  = req.params.id;
  OfferModel.find({from}).sort('-createdAt')
  .then(offers => res.json(offers))
  .catch(err => console.log(err));

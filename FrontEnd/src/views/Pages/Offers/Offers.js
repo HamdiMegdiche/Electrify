@@ -37,23 +37,24 @@ export default class Offers extends Component {
     e.preventDefault();
     const ether = 1000000000000000000;
 
+    let completed = false;
     try {
-      var response = await this.state.contract.methods
+      await this.state.contract.methods
         .makeTransaction(offer.from, offer.quantity)
         .send({
           value: (offer.quantity / 1000) * offer.unitPrice * ether
         });
 
-      console.log(response);
-      console.log("after transaction");
-
-
-      await api.post(`offers/confirm/${offer._id}`);
-      await this.updateOffersState();
+      completed = true;
     } catch (err) {
+      completed = true;
+      console.log("error in making offer !");
+    }
+
+    if (completed) {
+      console.log("success transaction : confirm now");
       await api.post(`offers/confirm/${offer._id}`);
       await this.updateOffersState();
-      console.log(err);
     }
   };
 
@@ -71,43 +72,36 @@ export default class Offers extends Component {
     try {
       const { contract, web3 } = await getContract();
       const [account] = await web3.eth.getAccounts();
-
-      web3.eth.defaultAccount = account;
-
-      // const event = contract.message({ fromBlock: 0, toBlock: "latest" });
-      // event.watch((error, result) => {
-      //   if (!error)
-      //     console.log("eveeeeeeeeeent");
-
-      // })
-
-      // contract.events.message({ fromBlock: 0, toBlock: "latest" })
-      // .on('data', (event) => {
-      //     console.log("eveeeeent"); // same results as the optional callback above
-      // })
-
-      // contract.getPastEvents(
-      //   "message",
-      //   { fromBlock: 0, toBlock: "latest" },
-      //   (error, event) => {
-      //     console.log(event.length);
-      //   }
-      // );
-
-      // contract.events.message({ fromBlock: 0, toBlock: "latest" }, (error, event) => { console.log(event); })
-      // .on('data', (event) => {
-      //     console.log(event); // same results as the optional callback above
-      // })
-      // .on('changed', (event) => {
-      //     // remove event from local database
-      // })
-      // .on('error', console.error);
-
       const user = JSON.parse(localStorage.getItem("user"));
 
+      web3.eth.defaultAccount = account;
       this.setState({ user, contract, web3 });
 
       await this.updateOffersState();
+
+      contract.events
+        .message()
+        .on("data", async event => {
+          let time = new Date(event.returnValues[4] * 1000).toLocaleString();
+
+          const trans = {
+            from: event.returnValues[0],
+            to: event.returnValues[1],
+            unitPrice: event.returnValues[1],
+            quantity: event.returnValues[3],
+            time
+          };
+
+          if (
+            trans.to === user.walletAddress ||
+            trans.from === user.walletAddress
+          ) {
+            await this.updateOffersState();
+
+            console.log("socket : trnsaction confrimed !");
+          }
+        })
+        .on("error", console.error);
     } catch (error) {
       console.error(error);
     }
