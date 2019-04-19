@@ -11,12 +11,12 @@ module.exports = {
       network_id: "*",
       websockets: true
     },
-    // development: {
-    //   host: "172.20.10.6",
-    //   port: 9502,
-    //   network_id: "1515",
-    //   websockets: true
-    // }
+    remote: {
+      host: "34.245.49.226",
+      port: 9501,
+      network_id: "1515",
+      websockets: true
+    }
   },
   // compilers: {
   //   solc: {
