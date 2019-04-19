@@ -16,10 +16,7 @@ let server = require('http').createServer(app);
 let io = require('socket.io')(server);
 
 // connect to mongoDB Remote
-let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
-
-// connect to mongoDB Local
-// const db = require('./config/keys').mongoURI;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING;
 
 mongoose.Promise = global.Promise;
 mongoose
@@ -27,7 +24,7 @@ mongoose
     useCreateIndex: true,
     useNewUrlParser: true
   })
-  .then(() => console.log('Connected to Local MongoDB'))
+  .then(() => console.log('Connected to MongoDB'))
   .catch(err => {
     console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
     process.exit();

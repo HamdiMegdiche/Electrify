@@ -3,14 +3,10 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const gravatar = require('gravatar');
-const keys = require('../config/keys');
 const passport = require('passport');
 // import models
 const {UserModel} = require('../models');
 
-// Load Input Validation
-const validateRegisterInput = require('../validation/register');
-const validateLoginInput = require('../validation/login');
 
 // get all users
 router.get('/', (req, res) => {
@@ -25,18 +21,13 @@ router.get('/', (req, res) => {
 // @desc    Register user
 // @access  Public
 router.post('/register', (req, res) => {
-  const { errors, isValid } = validateRegisterInput(req.body);
 
-  // Check Validation
-  if (!isValid) {
-    return res.status(400).json(errors);
-  }
+
   const { username, password, email,walletAddress } = req.body;
 
   UserModel.findOne({ username }).then(user => {
     if (user) {
-      errors.username = 'username exists';
-      return res.status(400).json(errors);
+      return res.status(400).json('username exists');
     }
     const avatar = gravatar.url(email, {s: '100', r: 'x', d: 'retro'}, false);
 
@@ -68,12 +59,8 @@ router.post('/register', (req, res) => {
 // @desc    Login User / Returning JWT Token
 // @access  Public
 router.post('/login', (req, res) => {
-  const { errors, isValid } = validateLoginInput(req.body);
 
-  // Check Validation
-  if (!isValid) {
-    return res.status(400).json(errors);
-  }
+
 
   let { username, password } = req.body;
 
@@ -87,18 +74,14 @@ router.post('/login', (req, res) => {
     // Check Password
     bcrypt.compare(password, user.password).then(isMatch => {
       if (isMatch) {
-        // User Matched
-        const payload = { id: user.id, name: user.username, avatar: user.avatar }; // Create JWT Payload
+        const { id, username, email, avatar, createdAt, smartHubId, walletAddress } = user;
+        const payload = { id, username, email, avatar, createdAt, smartHubId, walletAddress }; // Create JWT Payload
 
-        const {id, username , email, avatar, createdAt , smartHubId, walletAddress} = user;
         // Sign Token
-        jwt.sign(payload, keys.TOKEN_KEY, { expiresIn: "20 days" }, (err, token) => {
+        jwt.sign(payload, process.env.TOKEN_KEY, { expiresIn: "20 days" }, (err, token) => {
          return res.json({
             success: true,
             token,
-            user: {
-              id, username , email, avatar, createdAt , smartHubId,walletAddress
-            }
           });
         });
       } else {
