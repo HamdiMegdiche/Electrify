@@ -16,14 +16,14 @@ let server = require('http').createServer(app);
 let io = require('socket.io')(server);
 
 // connect to mongoDB Remote
-//let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
 
 // connect to mongoDB Local
-const db = require('./config/keys').mongoURI;
+// const db = require('./config/keys').mongoURI;
 
 mongoose.Promise = global.Promise;
 mongoose
-  .connect(db, {
+  .connect(mongoUrl, {
     useCreateIndex: true,
     useNewUrlParser: true
   })
