@@ -22,8 +22,7 @@ router.get('/', (req, res) => {
 // @access  Public
 router.post('/register', (req, res) => {
 
-
-  const { username, password, email,walletAddress } = req.body;
+  const { username, password, email,walletAddress, smartHubId} = req.body;
 
   UserModel.findOne({ username }).then(user => {
     if (user) {
@@ -37,7 +36,7 @@ router.post('/register', (req, res) => {
       avatar,
       password,
       walletAddress,
-      smartHubId: "123456789"
+      smartHubId
     });
 
     bcrypt.genSalt(10, (err, salt) => {

@@ -1,6 +1,8 @@
 import React, { Component, Suspense } from "react";
-import { Redirect, Route, Switch } from "react-router-dom";
+import { Route, Switch } from "react-router-dom";
 import { Container } from "reactstrap";
+import { connect } from "react-redux";
+import { setContractAction } from '../../actions/contractActions';
 
 import {
   AppAside,
@@ -23,34 +25,17 @@ const DefaultAside = React.lazy(() => import("./DefaultAside"));
 const DefaultFooter = React.lazy(() => import("./DefaultFooter"));
 const DefaultHeader = React.lazy(() => import("./DefaultHeader"));
 
-class DefaultLayout extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { user: null };
-  }
 
-  componentDidMount(){
-    let user = localStorage.getItem("user");
-    if (user) {
-      user = JSON.parse(user);
-      this.setState({user});
-    }
-  }
+class DefaultLayout extends Component {
 
   loading = () => <div className="sk-rotating-plane" />;
-
-  signOut(e) {
-    e.preventDefault();
-    localStorage.clear();
-    this.props.history.push("/login");
-  }
 
   render() {
     return (
       <div className="app">
         <AppHeader fixed>
           <Suspense fallback={this.loading()}>
-            <DefaultHeader onLogout={e => this.signOut(e)} user={this.state.user} />
+            <DefaultHeader {...this.props} />
           </Suspense>
         </AppHeader>
         <div className="app-body">
@@ -79,11 +64,6 @@ class DefaultLayout extends Component {
                       />
                     ) : null;
                   })}
-                  {localStorage.getItem("user") ? (
-                    <Redirect to="/dashboard" />
-                  ) : (
-                    <Redirect to="/login" />
-                  )}
                 </Switch>
               </Suspense>
             </Container>
@@ -96,7 +76,7 @@ class DefaultLayout extends Component {
         </div>
         <AppFooter>
           <Suspense fallback={this.loading()}>
-            <DefaultFooter />
+            <DefaultFooter {...this.props} />
           </Suspense>
         </AppFooter>
       </div>
@@ -104,4 +84,11 @@ class DefaultLayout extends Component {
   }
 }
 
-export default DefaultLayout;
+const mapStateToProps = state => ({
+  contract: state.contract.contract,
+  account: state.contract.account,
+  isAuthenticated: state.auth.isAuthenticated,
+  user: state.auth.user
+});
+
+export default connect(mapStateToProps,{setContractAction})(DefaultLayout);

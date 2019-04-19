@@ -1,5 +1,9 @@
-import React, { Component } from "react";
-import { Link } from "react-router-dom";
+import React, {Component} from "react";
+import {Link} from "react-router-dom";
+
+import {connect} from "react-redux";
+import {loginUser} from "../../../actions/authActions";
+
 import {
   Button,
   Card,
@@ -12,10 +16,9 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupText,
-  Row
+  Row,
+  Alert
 } from "reactstrap";
-import { Alert } from "reactstrap";
-import api from "../../../api";
 
 class Login extends Component {
   constructor(props) {
@@ -23,48 +26,50 @@ class Login extends Component {
     this.state = {
       username: "",
       password: "",
-      errorMsg: "",
-      visible: true
+      message: "",
+      visible: false
     };
   }
-  connectUser = async event => {
-    event.preventDefault();
 
-    const credentials = {
-      username: this.state.username,
-      password: this.state.password
-    };
-
-    console.log(`credentials typed : ${JSON.stringify(credentials)}`);
-
-    try {
-      const res = await api.post(`user/login`, credentials);
-      if (res.data) {
-        console.log("User credentials are correct");
-        console.log(res.data);
-        localStorage.setItem("user", JSON.stringify(res.data.user));
-        localStorage.setItem("token", res.data.token);
-
-        this.props.history.push("/dashboard");
-      }
-    } catch (error) {
-      this.setState({ errorMsg: "credentials are incorrect !", visible: true });
+  componentDidMount() {
+    if (this.props.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
     }
-  };
+  }
 
-  handleChange = event => {
-    this.setState({
-      [event.target.name]: event.target.value,
-      errorMsg: "",
-      visible: false
-    });
+   componentWillReceiveProps(nextProps) {
+    if (nextProps.auth.isAuthenticated) {
+      this.props.history.push("/dashboard");
+    }
+
+    if (nextProps.errors) {
+      this.setState({
+        message: nextProps.errors.message,
+        visible: nextProps.errors.visible
+      });
+    }
+  }
+
+  onChange = e => {
+    this.setState({[e.target.name]: e.target.value});
   };
 
   onDismiss = () => {
-    this.setState({ visible: false });
+    this.setState({visible: false});
+  };
+
+  onSubmit = e => {
+    e.preventDefault();
+    const userData = {
+      username: this.state.username,
+      password: this.state.password
+    };
+    this.props.loginUser(userData);
   };
 
   render() {
+    const {message, visible} = this.state;
+
     return (
       <div className="app flex-row align-items-center">
         <Container>
@@ -73,7 +78,8 @@ class Login extends Component {
               <CardGroup>
                 <Card className="p-4">
                   <CardBody>
-                    <Form onSubmit={e => this.connectUser(e)}>
+                    {/* <Form onSubmit={e => this.connectUser(e)}> */}
+                    <Form onSubmit={(e) => this.onSubmit(e)}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
                       <p className="text-muted">
@@ -87,11 +93,12 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
-                          onChange={this.handleChange}
+                          onChange={this.onChange}
                           type="text"
                           placeholder="Username"
                           autoComplete="username"
                           name="username"
+                          value={this.state.username}
                         />
                       </InputGroup>
                       <InputGroup className="mb-4">
@@ -101,22 +108,23 @@ class Login extends Component {
                           </InputGroupText>
                         </InputGroupAddon>
                         <Input
-                          onChange={this.handleChange}
+                          onChange={this.onChange}
                           type="password"
                           placeholder="Password"
                           autoComplete="current-password"
                           name="password"
+                          value={this.state.password}
                         />
                       </InputGroup>
-                      {this.state.errorMsg !== "" ? (
+                      {visible ? (
                         <Row>
                           <Col>
                             <Alert
                               color="danger"
-                              isOpen={this.state.visible}
+                              isOpen={visible}
                               toggle={this.onDismiss}
                             >
-                              {this.state.errorMsg}
+                              {message}
                             </Alert>
                           </Col>
                         </Row>
@@ -124,7 +132,6 @@ class Login extends Component {
                       <Row>
                         <Col xs="6">
                           <Button
-                            onClick={this.connectUser}
                             color="primary"
                             className="px-4"
                             name="connectButton"
@@ -143,7 +150,7 @@ class Login extends Component {
                 </Card>
                 <Card
                   className="text-white bg-primary py-5 d-md-down-none"
-                  style={{ width: "44%" }}
+                  style={{width: "44%"}}
                 >
                   <CardBody className="text-center">
                     <div>
@@ -174,4 +181,12 @@ class Login extends Component {
   }
 }
 
-export default Login;
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors
+});
+
+export default connect(
+  mapStateToProps,
+  {loginUser}
+)(Login);

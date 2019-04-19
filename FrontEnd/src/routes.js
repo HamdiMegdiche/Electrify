@@ -2,6 +2,7 @@ import React from "react";
 import DefaultLayout from "./containers/DefaultLayout";
 
 const Dashboard = React.lazy(() => import("./views/Pages/Dashboard/Dashboard"));
+const Page = React.lazy(() => import('./views/Pages/Page'));
 const Users = React.lazy(() => import("./views/Pages/Users/Users"));
 const User = React.lazy(() => import("./views/Pages/Users/User"));
 const Offers = React.lazy(() => import("./views/Pages/Offers/Offers"));
@@ -22,21 +23,27 @@ const Recommendation = React.lazy(() =>
 
 const routes = [
   { path: "/", exact: true, name: "Home", component: DefaultLayout },
+  {
+    path: '/weather',
+    exact:true,
+    name: 'Weather Forcast',
+    component: Page
+  },
   { path: "/dashboard", exact: true, name: "Dashboard", component: Dashboard },
-  { path: "/trades", exact: true, name: "Trades", component: Trades },
-  { path: "/trades/my-trades", exact: true, name: "MyTrades", component: MyTrades },
+  { path: "/trades", exact: true,name: "Trades", component: Trades },
+  { path: "/trades/my-trades", exact: true, name: "My Trades", component: MyTrades },
   { path: "/offers", exact: true, name: "Offers", component: Offers },
   {
     path: "/offers/make-offer",
     exact: true,
     name: "Make Offer",
-    component: OfferForm
+    component: OfferForm,
   },
   {
     path: "/offers/my-offers",
     exact: true,
     name: "My Offers",
-    component: MyOffers
+    component: MyOffers,
   },
   { path: "/settings", exact: true, name: "Settings", component: Settings },
   {

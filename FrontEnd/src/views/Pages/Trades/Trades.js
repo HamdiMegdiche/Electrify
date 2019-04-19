@@ -4,78 +4,63 @@ import {
   CardBody,
   CardHeader,
   Col,
-  // Pagination,
-  // PaginationItem,
-  // PaginationLink,
   Row,
   Table,
-  Button
+  Button,
+  Badge
 } from "reactstrap";
-import { Link } from "react-router-dom";
-import getContract from "../../../utils/getContract";
 
-export default class Trades extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { transactions: [], user: null };
-  }
+import Trade from "../../components/Trade";
+import { connect } from "react-redux";
+import { getTransactions } from "../../../actions/transactionsActions";
+class Trades extends Component {
 
-  async componentDidMount() {
-    const ether = 1000000000000000000;
 
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      const { contract } = await getContract();
-
-      const nbrTrans = await contract.methods.transCount().call();
-
-      const transactions = [];
-
-      for (let i = 0; i < nbrTrans; i++) {
-        const tr = await contract.methods.transactions(i).call();
-
-        const trans = {
-          from: tr[0],
-          to: tr[1],
-          unitPrice: tr[2]/ ether,
-          quantity: tr[3] / 1000,
-          date: new Date(tr[4]*1000).toLocaleString()
-        };
-        transactions.push(trans);
-      }
-
-      this.setState({ transactions, user });
-    } catch (error) {
-      console.error(error);
+  componentDidMount() {
+    if (this.props.contract) {
+      this.props.getTransactions(this.props.contract, this.props.web3, this.props.account);
     }
   }
-  toMyTransactions(){
-    // eslint-disable-next-line no-restricted-globals
-    location.href = "/trades/my-trades";
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.contract !== this.props.contract) {
+      this.props.getTransactions(nextProps.contract, nextProps.web3, nextProps.account);
+    }
+  }
+
+  toMyTransactions = () => {
+    this.props.history.push("/trades/my-trades");
   }
   render() {
+    const { transactions,myTransactions } = this.props;
+
     return (
       <div className="animated fadeIn">
         <Row>
           <Col>
             <Card>
-              <CardHeader>
-                <i className="cui-cart" /> All transactions made on the blockchain
-                <Button
+              <CardHeader> 
+                <h3>
+                There Are &nbsp;
+                <Badge color="warning">{transactions.length}</Badge> &nbsp; 
+                  Transactions
+                  <Button
                   onClick={this.toMyTransactions}
-                  className="float-right ml-2 mr-2"
+                  className="float-right"
                   color="info"
                   outline
                 >
                   <i className="fa fa-plus" />
-                  &nbsp;My Transactions
+                  &nbsp;My Transactions &nbsp;
+                  <Badge color="info">{myTransactions.length}</Badge> 
                 </Button>
+                  </h3>
+
               </CardHeader>
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    {this.state.transactions.length > 0 ? (
+                    {transactions.length > 0 ? (
                       <tr>
                         <th>From</th>
                         <th>To</th>
@@ -85,55 +70,17 @@ export default class Trades extends Component {
                       </tr>
                     ) : (
                       <tr>
-                        <th>There are no transactions yet.</th>
+                        <th>Loading Transactions</th>
                       </tr>
                     )}
                   </thead>
                   <tbody>
-                    {this.state.transactions.map((value, idx) => {
-                      return (
-                        <tr key={idx}>
-                          <td className="align-middle">
-                            <Link to={`/users/${value.from}`}>
-                              {value.from.substr(0, 30) + "..."}
-                            </Link>
-                          </td>
-                          <td className="align-middle">
-                            <Link to={`/users/${value.to}`}>{value.to.substr(0, 30) + "..."}</Link>
-                          </td>
-                          <td className="align-middle">{value.quantity}</td>
-                          <td className="align-middle">{value.unitPrice}</td>
-                          <td className="align-middle">{value.date}</td>
-                        </tr>
-                      );
-                    })}
+                   {transactions.map((trans, index) => (
+                      <Trade key={index} trans={trans} />
+                  ))}
                   </tbody>
                 </Table>
                 <nav>
-                  {/* <Pagination>
-                    <PaginationItem>
-                      <PaginationLink previous tag="button">
-                        Prev
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem active>
-                      <PaginationLink tag="button">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">2</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">4</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink next tag="button">
-                        Next
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination> */}
                 </nav>
               </CardBody>
             </Card>
@@ -143,3 +90,16 @@ export default class Trades extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  transactions: state.trans.transactions,
+  myTransactions: state.trans.myTransactions,
+  contract: state.contract.contract,
+  web3: state.contract.web3,
+  account: state.contract.account,
+
+});
+
+export default connect(
+  mapStateToProps,{getTransactions}
+)(Trades);

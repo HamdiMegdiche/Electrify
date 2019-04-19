@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import etherLogo from "../../../assets/ether.jpeg";
+import { addOffer } from "../../../actions/offerActions";
+import { connect } from "react-redux";
 
 import {
   Button,
@@ -13,12 +15,11 @@ import {
   InputGroupAddon,
   InputGroupText,
   Label,
-  Row
+  Row,
+  Alert
 } from "reactstrap";
-import api from "../../../api";
-import { Alert } from "reactstrap";
 
-export default class OfferForm extends Component {
+class OfferForm extends Component {
   constructor(props) {
     super(props);
 
@@ -28,7 +29,7 @@ export default class OfferForm extends Component {
       collapse: true,
       fadeIn: true,
       timeout: 300,
-      errorMsg: "",
+      message: "",
       visible: false,
       quantity: 2000,
       unitPrice: 1,
@@ -67,18 +68,19 @@ export default class OfferForm extends Component {
 
     this.setState({
       [event.target.name]: event.target.value,
-      errorMsg: "",
+      message: "",
       total,
       visible: false
     });
   };
 
-  handlerMakeOffer = async e => {
-    e.preventDefault();
+
+
+  handlerMakeOffer = e => {
 
     if (this.state.unitPrice <= 0 || isNaN(this.state.unitPrice))
       return this.setState({
-        errorMsg: "kWh price must be a number greater than 0",
+        message: "kWh price must be a number greater than 0",
         visible: true
       });
 
@@ -89,49 +91,44 @@ export default class OfferForm extends Component {
       this.state.quantity.toString(10).includes(",", 0)
     )
       return this.setState({
-        errorMsg: "Quantity must be an integer greater than 0",
+        message: "Quantity must be an integer greater than 0",
         visible: true
       });
 
-    const user = JSON.parse(localStorage.getItem("user"));
+    const user = this.props.auth.user;
     if (user.walletAddress.length <= 0)
       return this.setState({
-        errorMsg:
+        message:
           "Please verify that you are connected to your MetaMask wallet",
         visible: true
       });
 
-    try {
-      let body = {
+      const newOffer = {
         from: user.walletAddress,
         unitPrice: this.state.unitPrice,
         quantity: this.state.quantity
       };
 
-      const res = await api.post(`offers/create`, JSON.stringify(body));
-      if (res.data) {
-        let { _id: id, username, email, createdAt } = res.data;
-        createdAt = new Date(createdAt).toLocaleString();
-
-        this.setState({ id, username, email, createdAt });
-        this.props.history.push("/offers/my-offers");
-
-        // eslint-disable-next-line no-restricted-globals
-        location.reload();
-      } else {
-        this.props.history.push("/404");
-      }
-    } catch (error) {
-      console.error(error);
-      this.setState({ errorMsg: "Error while saving offer", visible: true });
-    }
+    this.props.addOffer(newOffer);
+    this.props.history.push("/offers/my-offers");
   };
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.errors) {
+      this.setState({
+        message: nextProps.errors.message,
+        visible: nextProps.errors.visible 
+      });
+    }
+  }
 
   handlerCancelMakeOffer = e => {
     e.preventDefault();
     this.setState({ quantity: 0, total: 0, unitPrice: 0, visible: false });
   };
+
   render() {
+    const {user} = this.props.auth
     return (
       <div className="animated fadeIn">
         <Row>
@@ -150,7 +147,7 @@ export default class OfferForm extends Component {
                       </Col>
                       <Col md="9">
                         <p className="form-control-static">
-                          {JSON.parse(localStorage.getItem("user")).id}
+                          {user.id}
                         </p>
                       </Col>
                     </FormGroup>
@@ -222,10 +219,10 @@ export default class OfferForm extends Component {
                         isOpen={this.state.visible}
                         toggle={this.onDismiss}
                       >
-                        {this.state.errorMsg}
+                        {this.state.message}
                       </Alert>
                       <Button
-                        onClick={e => this.handlerMakeOffer(e)}
+                        onClick={this.handlerMakeOffer}
                         className="float-left"
                         color="success"
                         outline
@@ -234,7 +231,7 @@ export default class OfferForm extends Component {
                         &nbsp;Accept
                       </Button>
                       <Button
-                        onClick={e => this.handlerCancelMakeOffer(e)}
+                        onClick={this.handlerCancelMakeOffer}
                         className="ml-2"
                         color="danger"
                         outline
@@ -256,3 +253,14 @@ export default class OfferForm extends Component {
     );
   }
 }
+
+
+const mapStateToProps = state => ({
+  auth: state.auth,
+  errors: state.errors,
+});
+
+export default connect(
+  mapStateToProps,
+  { addOffer }
+)(OfferForm);

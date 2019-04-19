@@ -10,6 +10,11 @@ export default {
       icon: "icon-speedometer"
     },
     {
+      name: "Weather Forecast",
+      url: "/weather",
+      icon: "fa fa-cloud"
+    },
+    {
       title: true,
       name: "Powerchain"
     },
