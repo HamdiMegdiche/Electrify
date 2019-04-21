@@ -29,7 +29,7 @@ class Offers extends Component {
     this.props.history.push("/offers/make-offer");
   };
   handlerMyOffers = () => {
-    this.props.history.push("/offers/my-offers");
+    this.props.history.push("/my-offers");
   };
 
   handleChange = event => {
