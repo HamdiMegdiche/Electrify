@@ -24,9 +24,25 @@ export default {
       icon: "fa fa-exchange"
     },
     {
-      name: "Offers",
-      url: "/offers",
-      icon: "cui-cart"
+      name: "Buy Energy",
+      icon: "cui-euro",
+      children: [
+        {
+          name: "Offers",
+          url: "/offers",
+          icon: "cui-cart"
+        },
+        {
+          name: "My Offers",
+          url: "/my-offers",
+          icon: "cui-list"
+        },
+        {
+          name: "Offer Analytics",
+          url: "/offer-analytics",
+          icon: "cui-graph"
+        }
+      ]
     },
     {
       name: "Settings",

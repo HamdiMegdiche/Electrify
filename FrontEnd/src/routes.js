@@ -6,6 +6,7 @@ const Page = React.lazy(() => import('./views/Pages/Page'));
 const Users = React.lazy(() => import("./views/Pages/Users/Users"));
 const User = React.lazy(() => import("./views/Pages/Users/User"));
 const Offers = React.lazy(() => import("./views/Pages/Offers/Offers"));
+const OfferAnalytics = React.lazy(() => import("./views/Pages/Offers/OfferAnalytics"));
 const Trades = React.lazy(() => import("./views/Pages/Trades/Trades"));
 const MyTrades = React.lazy(() => import("./views/Pages/Trades/MyTrades"));
 const OfferForm = React.lazy(() => import("./views/Pages/Offers/OfferForm"));
@@ -33,6 +34,7 @@ const routes = [
   { path: "/trades", exact: true,name: "Trades", component: Trades },
   { path: "/trades/my-trades", exact: true, name: "My Trades", component: MyTrades },
   { path: "/offers", exact: true, name: "Offers", component: Offers },
+  { path: "/offer-analytics", exact: true, name: "Analytics", component: OfferAnalytics },
   {
     path: "/offers/make-offer",
     exact: true,
@@ -40,7 +42,7 @@ const routes = [
     component: OfferForm,
   },
   {
-    path: "/offers/my-offers",
+    path: "/my-offers",
     exact: true,
     name: "My Offers",
     component: MyOffers,

@@ -6,14 +6,17 @@ import {
   OFFER_LOADING,
   GET_MY_OFFERS,
   DELETE_ALL_OFFERS,
-  BUY_OFFER
+  BUY_OFFER,
+  SEARCH_OFFER,
 } from "../actions/types";
 
 const initialState = {
   offers: [],
   offer: {},
   myOffers:[],
-  loading: false
+  loading: false,
+  search: [],
+  searching :false
 };
 
 export default function(state = initialState, action) {
@@ -62,6 +65,12 @@ export default function(state = initialState, action) {
         offers: state.offers.map(offer => (offer._id === action.payload._id) ? offer = action.payload : offer),
         myOffers: state.myOffers.map(offer => (offer._id === action.payload._id) ? offer = action.payload : offer)
       };
+    case SEARCH_OFFER: 
+    return {
+      ...state,
+      search: action.payload.offers,
+      searching: action.payload.searching
+    };
     default:
       return state;
   }

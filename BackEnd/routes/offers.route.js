@@ -10,6 +10,24 @@ router.get('/', passport.authenticate('jwt', {  session: false}), (req, res) => 
  .catch(err => res.send(err));
 });
 
+router.post('/search', passport.authenticate('jwt', { session: false }), (req, res) => {
+  const { min, max } = req.body;
+  console.log('body:', req.body)
+  
+  if (min !== '' && max !== '') {
+    OfferModel.find({ 'unitPrice': { $gte: min, $lte: max } })
+      .sort('unitPrice')
+      .then(offers => {
+        res.json({ offers, searching: true })
+      })
+      .catch(err => res.send(err));
+      }else if(min === '' || max === ''){
+      res.json({offers:[],searching:false});
+    }
+});
+
+
+
 router.post('/create', passport.authenticate('jwt', { session: false }), (req, res) => {
   const { from, unitPrice, quantity } = req.body;
   const newOffer = new OfferModel({
@@ -35,6 +53,10 @@ router.post('/confirm/:id', passport.authenticate('jwt', {session: false}), (req
 
   });
 });
+
+
+
+
 
 // get offers by from wallet address
 router.get('/from/:id', passport.authenticate('jwt', {  session: false}), (req, res) => {

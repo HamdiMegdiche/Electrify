@@ -10,6 +10,7 @@ import {
   GET_MY_OFFERS,
   DELETE_ALL_OFFERS,
   BUY_OFFER,
+  SEARCH_OFFER,
 } from "../actions/types";
 
 export const addOffer = offerData => dispatch => {
@@ -177,6 +178,31 @@ export const deleteAllOffers = body => dispatch => {
       }
     })
 };
+
+
+
+export const searchOffers = (min, max) => dispatch => {
+  const body = { min, max };
+  axios
+  .post('/offers/search/',body)
+  .then(res =>
+    dispatch({
+      type: SEARCH_OFFER,
+      payload: res.data
+    })
+  )
+  .catch(error => {
+    if (error.response && error.response.data) {
+      dispatch({
+        type: GET_ERRORS,
+        payload: {
+          message: error.response.data,
+          visible: true
+        }
+      })
+    }
+  })
+}
 
 // Set loading state
 export const setOfferLoading = () => {
