@@ -110,7 +110,7 @@ class OfferForm extends Component {
       };
 
     this.props.addOffer(newOffer);
-    this.props.history.push("/offers/my-offers");
+    this.props.history.push("/my-offers");
   };
 
   componentWillReceiveProps(nextProps) {

@@ -22,16 +22,18 @@ const notify = trans => {
 
 export default function(state = initialState, action) {
   switch (action.type) {
-    case SET_TRANSACTION:
-      let tran = [];
-      if (action.payload.account === action.payload.transaction.from || action.payload.account === action.payload.transaction.to) {
-        notify(action.payload.transaction);
-         tran = [...state.myTransactions,action.payload.transaction]
-      }
-      return {
-        transactions: [...state.transactions, action.payload.transaction].sort((t1,t2) => (t1.date <= t2.date) ? 1 : -1),
-        myTransactions : tran.sort((t1,t2) => (t1.date <= t2.date) ? 1 : -1),
-      };
+    case SET_TRANSACTION: 
+      notify(action.payload.transaction);
+      if (action.payload.account === action.payload.transaction.to){
+        return {
+          transactions: [...state.transactions, action.payload.transaction].sort((t1, t2) => (t1.date <= t2.date) ? 1 : -1),
+          myTransactions: [...state.myTransactions, action.payload.transaction].sort((t1, t2) => (t1.date <= t2.date) ? 1 : -1)
+        };
+      }else
+        return {
+          transactions: [...state.transactions, action.payload.transaction].sort((t1, t2) => (t1.date <= t2.date) ? 1 : -1),
+          myTransactions: state.myTransactions
+        };
     case SET_TRANSACTIONS:
       return {
         transactions: action.payload.transactions.sort((t1,t2) => (t1.date <= t2.date) ? 1 : -1),

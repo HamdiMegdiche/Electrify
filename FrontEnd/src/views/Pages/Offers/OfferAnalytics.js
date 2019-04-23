@@ -6,27 +6,19 @@ import { connect } from "react-redux";
 
 
 class OfferAnalytics extends Component {
-
   handlerMakeOffer = () => {
     this.props.history.push("/offers/make-offer");
   };
   handlerMyOffers = () => {
     this.props.history.push("/offers/my-offers");
-  };
-
-
-  
+  }; 
   componentWillMount() {
   }
-
-
-
   render() {
-
     return (
       <div className="animated fadeIn">
         <Row>
-          <Col sm="12" xl="6">
+          <Col sm="12" xl="12">
             <Card>
               <CardHeader>
                 <i className="fa fa-align-justify"></i><strong>List Group</strong>
@@ -34,10 +26,9 @@ class OfferAnalytics extends Component {
               </CardHeader>
               <CardBody>
                 <ListGroup>
-                  <ListGroupItem className="justify-content-between">Cras justo odio <Badge className="float-right" pill>14</Badge></ListGroupItem>
-                  <ListGroupItem className="justify-content-between">Dapibus ac facilisis in <Badge className="float-right" pill>2</Badge></ListGroupItem>
-                  <ListGroupItem className="justify-content-between">Morbi leo risus <Badge className="float-right" pill
-                                                                                            color="warning">1</Badge></ListGroupItem>
+                  <ListGroupItem className="justify-content-between">All offers:<Badge className="float-right" pill>14</Badge></ListGroupItem>
+                  <ListGroupItem className="justify-content-between">My Offers:<Badge className="float-right" pill>2</Badge></ListGroupItem>
+                  <ListGroupItem className="justify-content-between">Current Kwh price: <Badge className="float-right" pill color="warning">1</Badge></ListGroupItem>
                 </ListGroup>
               </CardBody>
             </Card>
