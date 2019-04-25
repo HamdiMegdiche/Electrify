@@ -50,6 +50,7 @@ class MnistModel extends React.Component {
         train={this.props.train}
         display
       >     
+        
         <Model
           optimizer={tf.train.sgd(0.15)}
           loss='categoricalCrossentropy'
