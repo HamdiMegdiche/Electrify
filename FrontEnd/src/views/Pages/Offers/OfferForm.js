@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import etherLogo from "../../../assets/ether.jpeg";
 import { addOffer } from "../../../actions/offerActions";
 import { connect } from "react-redux";
+import socketIOClient from "socket.io-client";
 
 import {
   Button,
@@ -26,6 +27,9 @@ class OfferForm extends Component {
     this.toggle = this.toggle.bind(this);
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
+      messageArduino : "Please Authenticate Via RFID to Activate prosumer mode.",
+      showBtn: true,
+      color:"danger",
       collapse: true,
       fadeIn: true,
       timeout: 300,
@@ -95,7 +99,7 @@ class OfferForm extends Component {
         visible: true
       });
 
-    const user = this.props.auth.user;
+    const {user} = this.props;
     if (user.walletAddress.length <= 0)
       return this.setState({
         message:
@@ -113,22 +117,46 @@ class OfferForm extends Component {
     this.props.history.push("/my-offers");
   };
 
-  componentWillReceiveProps(nextProps) {
-    if (nextProps.errors) {
-      this.setState({
-        message: nextProps.errors.message,
-        visible: nextProps.errors.visible 
-      });
-    }
-  }
+  // componentWillReceiveProps(nextProps) {
+  //   if (nextProps.errors) {
+  //     this.setState({
+  //       message: nextProps.errors.message,
+  //       visible: nextProps.errors.visible 
+  //     });
+  //   }
+  // }
 
   handlerCancelMakeOffer = e => {
     e.preventDefault();
     this.setState({ quantity: 0, total: 0, unitPrice: 0, visible: false });
   };
 
+    
+  componentDidMount() {
+    const {user} = this.props;
+    const socket = socketIOClient("http://localhost:4000", { transports: ['websocket'] });
+    socket.on("FromAPI", data => {
+      console.log('data:', data)
+
+      if (data._id === user.id) {
+        this.setState({
+          showBtn: false,
+          color: "success",
+          messageArduino:"Hello "+user.username+" you can sell energy now :) "
+        })
+      } else {
+        this.setState({
+          showBtn: true,
+          color: "warning",
+          messageArduino:"Wrong RFID tag this belongs to "+data.username
+        })
+      }
+    });
+  }
+
+
   render() {
-    const {user} = this.props.auth
+    const {user} = this.props
     return (
       <div className="animated fadeIn">
         <Row>
@@ -221,11 +249,17 @@ class OfferForm extends Component {
                       >
                         {this.state.message}
                       </Alert>
+                      <Alert
+                        color={this.state.color}
+                        isOpen={!this.state.visible}
+                      >
+                        {this.state.messageArduino}
+                      </Alert>
                       <Button
                         onClick={this.handlerMakeOffer}
                         className="float-left"
-                        color="success"
-                        outline
+                        color={this.state.color}
+                        disabled={this.state.showBtn}
                       >
                         <i className="fa fa-plus" />
                         &nbsp;Accept
@@ -233,7 +267,7 @@ class OfferForm extends Component {
                       <Button
                         onClick={this.handlerCancelMakeOffer}
                         className="ml-2"
-                        color="danger"
+                        color="secondary"
                         outline
                       >
                         <i className="fa fa-plus" />
@@ -256,7 +290,7 @@ class OfferForm extends Component {
 
 
 const mapStateToProps = state => ({
-  auth: state.auth,
+  user: state.auth.user,
   errors: state.errors,
 });
 

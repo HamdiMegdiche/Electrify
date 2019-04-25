@@ -295,7 +295,7 @@ class Dashboard extends Component {
     // ---------------------------- weather skander------------------------------------------------------
     console.log("Get initial data ");
   //------------------------Weather -------------
-       axios.get(`http://192.168.1.51:5000/weather`).then((resWeather) => 
+       axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) => 
 {
         console.log("Get inital data done");
         this.setState({humidity: resWeather.data.humidity.toFixed(2)});
@@ -310,7 +310,7 @@ class Dashboard extends Component {
       this.interval = setInterval(() =>  this.updateWeather(), 2000);
     });
 //-------------------------Consumption------------------------------
-axios.get(`http://192.168.1.51:5000/consumption`).then((resWeather) => 
+axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) => 
 {
         console.log("Get inital data done");
         this.setState({consumption_rasp: resWeather.data.watts.toFixed(2)});
@@ -328,7 +328,7 @@ axios.get(`http://192.168.1.51:5000/consumption`).then((resWeather) =>
    updateWeather() {
     console.log('Get data updated each 5 s');
     try {
-      axios.get(`http://192.168.1.51:5000/weather`).then((resWeather) => 
+      axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) => 
       {
               this.setState({humidity: resWeather.data.humidity.toFixed(2)});
               this.setState({temperature: resWeather.data.temperature.toFixed(2)});
@@ -348,7 +348,7 @@ axios.get(`http://192.168.1.51:5000/consumption`).then((resWeather) =>
   updateconsumptionrasp() {
     console.log('Get data updated each 1 s');
     try {
-      axios.get(`http://192.168.1.51:5000/consumption`).then((consump) => 
+      axios.get(`http://172.20.10.7:5000/consumption`).then((consump) => 
       {
               this.setState({consumption_rasp: consump.data.watts.toFixed(2)});
             })
@@ -717,7 +717,7 @@ axios.get(`http://192.168.1.51:5000/consumption`).then((resWeather) =>
         </Row>
         <Row>
         <Col  xs="12" sm="6" lg="3">
-            <Card style={{maxHeight:100}} className="text-white bg-primary">
+            <Card style={{maxHeight:100}} className="text-white bg-info">
               <CardBody className="pb-0 card-body">
                 <div className="text-value weather">
                 <h3>{this.state.temperature}°C</h3>
@@ -739,7 +739,7 @@ axios.get(`http://192.168.1.51:5000/consumption`).then((resWeather) =>
           </Col>
 
           <Col  xs="12" sm="6" lg="3">
-            <Card style={{maxHeight:100}} className="text-white bg-primary">
+            <Card style={{maxHeight:100}} className="text-white bg-warning">
               <CardBody className="pb-0 card-body">
                 <div className="text-value weather">
                 <h3>{this.state.consumption_rasp}Watt</h3>
