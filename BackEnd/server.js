@@ -1,5 +1,6 @@
 require('dotenv').config();
 
+
 const express = require('express');
 const logger = require('morgan');
 const methodOverride = require('method-override');
@@ -27,12 +28,13 @@ mongoose
     useCreateIndex: true,
     useNewUrlParser: true
   })
-  .then(() => console.log('Connected to Local MongoDB'))
+  .then(() => {
+    console.log('Connected to Local MongoDB');
+  })
   .catch(err => {
     console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
     process.exit();
   });
-
 // Passport middleware
 app.use(passport.initialize());
 

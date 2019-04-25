@@ -5,19 +5,30 @@
   "copyright": "Copyright 2019 HEXAGONE 4TWIN2",
   "license": "ESPRIT",
   "private": true,
+  "nodemonConfig": {
+    "ignore": [
+      "neuralNetwork.json",
+      "neuralNetworkConsumption.json",
+      "neuralNetworkProduction.json"
+    ]
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/HamdiMegdiche/Electrify.git"
   },
   "scripts": {
     "start": "node server.js",
-    "server": "nodemon server.js"
+    "server": "nodemon server.js",
+    "dev": "nodemon server.js -e js"
   },
   "dependencies": {
+    "@tensorflow/tfjs": "^1.0.3",
+    "@tensorflow/tfjs-node": "^1.0.2",
     "@types/node": "^11.11.4",
     "bcrypt": "^3.0.5",
     "bcryptjs": "^2.4.3",
     "body-parser": "~1.18.2",
+    "brain.js": "^1.6.1",
     "cookie-parser": "~1.4.3",
     "cors": "^2.8.5",
     "debug": "~2.6.9",
@@ -31,6 +42,7 @@
     "mongoose": "^5.4.18",
     "monk": "^6.0.6",
     "morgan": "~1.9.0",
+    "neataptic": "^1.4.7",
     "os": "^0.1.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
