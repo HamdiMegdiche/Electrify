@@ -1,9 +1,13 @@
-import React, { Component } from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import React, {Component} from "react";
+import {BrowserRouter, Route, Switch} from "react-router-dom";
 import Loadable from "react-loadable";
 import "./App.scss";
-import PrivateRoute from "./PrivateRoute";
-
+import PrivateRoute from "./views/components/PrivateRoute";
+import jwt_decode from "jwt-decode";
+import {Provider} from "react-redux";
+import store from "./store";
+import {setCurrentUser, logoutUser} from "./actions/authActions";
+import {setContractAction, clearContract} from "./actions/contractActions";
 const loading = () => <div className="sk-rotating-plane" />;
 
 // Containers
@@ -28,25 +32,49 @@ const Page404 = Loadable({
   loading
 });
 
+
+if (localStorage.token) {
+  const decoded = jwt_decode(localStorage.token);
+  // Set user and isAuthenticated
+  store.dispatch(setCurrentUser(decoded));
+  store.dispatch(setContractAction());
+  // Check for expired token
+  const currentTime = Date.now() / 1000;
+  if (decoded.exp < currentTime) {
+    // Logout user
+    store.dispatch(logoutUser());
+    store.dispatch(clearContract());
+
+    // Redirect to login
+    window.location.href = "/login";
+  }
+}
+
+
+
+
+
 class App extends Component {
 
+  
 
   render() {
     return (
-      <BrowserRouter>
-        <Switch>
-          <Route exact path="/login" name="Login Page" component={Login} />
-          <Route
-            exact
-            path="/register"
-            name="Register Page"
-            component={Register}
-          />
-          <Route path="/404" exact name="Page 404" component={Page404} />
-
-          <PrivateRoute path="/" name="Home" component={DefaultLayout} />
-        </Switch>
-      </BrowserRouter>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Switch>
+            <Route exact path="/login" name="Login Page" component={Login} />
+            <Route
+              exact
+              path="/register"
+              name="Register Page"
+              component={Register}
+            />
+            <Route path="/404" exact name="Page 404" component={Page404} />
+            <PrivateRoute path="/" name="Home" component={DefaultLayout} />
+          </Switch>
+        </BrowserRouter>
+      </Provider>
     );
   }
 }

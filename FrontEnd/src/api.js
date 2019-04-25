@@ -1,5 +1,4 @@
 import axios from 'axios';
-
 const api = axios.create({
   baseURL: `http://localhost:4000/api/`
 });
@@ -15,7 +14,8 @@ api.interceptors.request.use(function(config) {
   }
 
   return config;
-}, function(err) {
+}, function (err) {
+    console.log('teset'+err)
   return Promise.reject(err);
 });
 

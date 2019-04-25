@@ -1,126 +1,115 @@
 import React, { Component } from "react";
 import {
-  Badge,
   Card,
   CardBody,
   CardHeader,
   Col,
-  // Pagination,
-  // PaginationItem,
-  // PaginationLink,
   Row,
   Table,
-  Button
+  Button,
+  FormGroup,
+  Form,
+  InputGroupAddon,
+  Input,
+  InputGroup
 } from "reactstrap";
-import { Link } from "react-router-dom";
 
-import api from "../../../api";
-import getContract from "../../../utils/getContract";
+import { connect } from "react-redux";
+import Offer from "./../../components/Offer";
+import { getOffers,searchOffers } from "../../../actions/offerActions";
 
-export default class Offers extends Component {
-  constructor(props) {
-    super(props);
-    this.handlerMakeOffer = this.handlerMakeOffer.bind(this);
-    this.handlerMyOffers = this.handlerMyOffers.bind(this);
+class Offers extends Component {
 
-    this.state = { offers: [], user: null, contract: null, web3: null };
+  state={
+    minimum : "",
+    maximum : ""
   }
 
   handlerMakeOffer = () => {
     this.props.history.push("/offers/make-offer");
   };
   handlerMyOffers = () => {
-    this.props.history.push("/offers/my-offers");
+    this.props.history.push("/my-offers");
   };
 
-  buyNow = async (e, offer) => {
-    e.preventDefault();
-    const ether = 1000000000000000000;
+  handleChange = event => {
+    let total = 0;
+    if (
+      event.target.value > 0 &&
+      this.state.unitPrice > 0 &&
+      event.target.name === "quantity"
+    )
+      total = (event.target.value / 1000) * this.state.unitPrice;
+    else if (
+      this.state.quantity > 0 &&
+      event.target.value > 0 &&
+      event.target.name === "unitPrice"
+    )
+      total = (this.state.quantity / 1000) * event.target.value;
 
-    try {
-      var response = await this.state.contract.methods
-        .makeTransaction(offer.from, offer.quantity)
-        .send({
-          value: (offer.quantity / 1000) * offer.unitPrice * ether
-        });
-
-      console.log(response);
-      console.log("after transaction");
-
-
-      await api.post(`offers/confirm/${offer._id}`);
-      await this.updateOffersState();
-    } catch (err) {
-      await api.post(`offers/confirm/${offer._id}`);
-      await this.updateOffersState();
-      console.log(err);
-    }
+    this.setState({
+      [event.target.name]: event.target.value,
+      message: "",
+      total,
+      visible: false
+    });
   };
 
-  async updateOffersState() {
-    try {
-      const res = await api.get(`offers/`);
-      if (res.data) {
-        this.setState({ offers: res.data });
-      }
-    } catch (error) {
-      console.log(error);
+  onChange = event => {
+    this.setState({
+      [event.target.name]: event.target.value,
+    });
+    if (event.target.name === 'minimum') {
+      this.props.searchOffers(event.target.value,this.state.maximum);
+    } else {
+      this.props.searchOffers(this.state.minimum,event.target.value);
     }
   }
-  async componentDidMount() {
-    try {
-      const { contract, web3 } = await getContract();
-      const [account] = await web3.eth.getAccounts();
 
-      web3.eth.defaultAccount = account;
-
-      // const event = contract.message({ fromBlock: 0, toBlock: "latest" });
-      // event.watch((error, result) => {
-      //   if (!error)
-      //     console.log("eveeeeeeeeeent");
-
-      // })
-
-      // contract.events.message({ fromBlock: 0, toBlock: "latest" })
-      // .on('data', (event) => {
-      //     console.log("eveeeeent"); // same results as the optional callback above
-      // })
-
-      // contract.getPastEvents(
-      //   "message",
-      //   { fromBlock: 0, toBlock: "latest" },
-      //   (error, event) => {
-      //     console.log(event.length);
-      //   }
-      // );
-
-      // contract.events.message({ fromBlock: 0, toBlock: "latest" }, (error, event) => { console.log(event); })
-      // .on('data', (event) => {
-      //     console.log(event); // same results as the optional callback above
-      // })
-      // .on('changed', (event) => {
-      //     // remove event from local database
-      // })
-      // .on('error', console.error);
-
-      const user = JSON.parse(localStorage.getItem("user"));
-
-      this.setState({ user, contract, web3 });
-
-      await this.updateOffersState();
-    } catch (error) {
-      console.error(error);
-    }
+  
+  componentWillMount() {
+    this.props.getOffers();
   }
 
   render() {
+    const { offers } = this.props;
+
+    
+    const offersList = (
+        this.props.offers.map((offer, index) => (
+          <Offer key={index} offer={offer} />
+        )));
+    const searchList = (
+      this.props.search.map((offer, index) => (
+        <Offer key={index} offer={offer} />
+      )));
+
+
     return (
       <div className="animated fadeIn">
         <Row>
           <Col>
             <Card>
               <CardHeader>
-                <i className="cui-cart" /> Offers
+                <Form action="" method="post" className="form-horizontal">
+                <FormGroup row>
+                    <Col md="4">
+                      <InputGroup>
+                        <InputGroupAddon addonType="prepend">
+                          <Button type="button" color="primary"> Minimum:</Button>
+                        </InputGroupAddon>
+                        <Input min="0" onChange={this.onChange} value={this.state.minimum} type="number" id="input1-group2" name="minimum" placeholder="Insert Number" />
+                      </InputGroup>
+                    </Col>
+                    <Col md="4">
+                      <InputGroup>
+                        <InputGroupAddon addonType="prepend">
+                          <Button type="button" color="primary">Maximum:</Button>
+                        </InputGroupAddon>
+                        <Input min="0" onChange={this.onChange} value={this.state.maximum} type="number" id="input1-group2" name="maximum" placeholder="Insert Number" />
+                      </InputGroup>
+                    </Col>
+
                 <Button
                   onClick={this.handlerMakeOffer}
                   className="float-right"
@@ -139,11 +128,13 @@ export default class Offers extends Component {
                   <i className="fa fa-plus" />
                   &nbsp;My Offers
                 </Button>
+                </FormGroup>
+                </Form>
               </CardHeader>
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    {this.state.offers.length > 0 ? (
+                    { offers.length !== 0 ? (
                       <tr>
                         <th>From</th>
                         <th>Energy (kwh)</th>
@@ -159,75 +150,9 @@ export default class Offers extends Component {
                     )}
                   </thead>
                   <tbody>
-                    {this.state.offers.map((value, idx) => {
-                      return (
-                        <tr key={value._id}>
-                          <td className="align-middle">
-                            <Link to={`/users/${value.from}`}>
-                              {value.from.substr(0, 30) + "..."}
-                            </Link>
-                          </td>
-                          <td className="align-middle">
-                            {value.quantity / 1000}
-                          </td>
-                          <td className="align-middle">
-                            {(value.quantity / 1000) * value.unitPrice}
-                          </td>
-                          <td className="align-middle">
-                            {new Date(value.createdAt).toLocaleString()}
-                          </td>
-                          <td className="align-middle">
-                            {value.status === "Pending" ? (
-                              <Badge color="success">{value.status}</Badge>
-                            ) : (
-                              <Badge color="danger">{value.status}</Badge>
-                            )}
-                          </td>
-                          <td className="align-middle">
-                            <Button
-                              color="danger"
-                              onClick={e => this.buyNow(e, value)}
-                              outline
-                              disabled={
-                                this.state.user.walletAddress === value.from ||
-                                value.status === "Passed"
-                              }
-                            >
-                              <i className="cui-credit-card" />
-                              &nbsp;Buy Now
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                      {this.props.searching ? searchList : offersList}
                   </tbody>
                 </Table>
-                <nav>
-                  {/* <Pagination>
-                    <PaginationItem>
-                      <PaginationLink previous tag="button">
-                        Prev
-                      </PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem active>
-                      <PaginationLink tag="button">1</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">2</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">3</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink tag="button">4</PaginationLink>
-                    </PaginationItem>
-                    <PaginationItem>
-                      <PaginationLink next tag="button">
-                        Next
-                      </PaginationLink>
-                    </PaginationItem>
-                  </Pagination> */}
-                </nav>
               </CardBody>
             </Card>
           </Col>
@@ -236,3 +161,15 @@ export default class Offers extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  offers: state.offer.offers,
+  searching: state.offer.searching,
+  search: state.offer.search,
+  loading: state.offer.loading,
+});
+
+export default connect(
+  mapStateToProps,
+  { getOffers,searchOffers }
+)(Offers);

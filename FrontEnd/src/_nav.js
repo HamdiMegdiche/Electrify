@@ -10,6 +10,11 @@ export default {
       icon: "icon-speedometer"
     },
     {
+      name: "Weather Forecast",
+      url: "/weather",
+      icon: "fa fa-cloud"
+    },
+    {
       title: true,
       name: "Powerchain"
     },
@@ -19,9 +24,25 @@ export default {
       icon: "fa fa-exchange"
     },
     {
-      name: "Offers",
-      url: "/offers",
-      icon: "cui-cart"
+      name: "Buy Energy",
+      icon: "cui-euro",
+      children: [
+        {
+          name: "Offers",
+          url: "/offers",
+          icon: "cui-cart"
+        },
+        {
+          name: "My Offers",
+          url: "/my-offers",
+          icon: "cui-list"
+        },
+        {
+          name: "Offer Analytics",
+          url: "/offer-analytics",
+          icon: "cui-graph"
+        }
+      ]
     },
     {
       name: "Settings",

@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import {
-  Badge,
   Card,
   CardBody,
   CardHeader,
@@ -12,62 +11,56 @@ import {
   Table,
   Button
 } from "reactstrap";
-import api from "../../../api";
+import { connect } from "react-redux";
+import Offer from "./../../components/Offer";
+import { getMyOffers,deleteAllOffers } from "../../../actions/offerActions";
 
-export default class Offers extends Component {
-  constructor(props) {
-    super(props);
-    this.handlerDeleteAll = this.handlerDeleteAll.bind(this);
-    this.state = { offers: [] };
-  }
+class MyOffers extends Component {
 
   async componentDidMount() {
-    try {
-      const user = JSON.parse(localStorage.getItem("user"));
-      const body = {
-        from: user.walletAddress
-      };
+    
+    const user = this.props.user;
+    this.props.getMyOffers(user.walletAddress);
 
-      const res = await api.post(`offers/`, body);
-      if (res.data) {
-        const offers = res.data;
+    // try {
+    //     if (this.props.ctr) {
+    //       const { contract } = this.props.ctr;
+    //     contract.events
+    //       .message()
+    //       .on("data", async event => {
+    //         const trans = {
+    //           from: event.returnValues[0],
+    //           to: event.returnValues[1]
+    //         };
 
-        this.setState({ offers });
-      } else {
-        this.props.history.push("/404");
-      }
-    } catch (error) {
-      console.error(error);
-    }
+    //         if (
+    //           trans.to === user.walletAddress ||
+    //           trans.from === user.walletAddress
+    //         ) {
+    //           this.props.getMyOffers(user.walletAddress);
+
+    //           // eslint-disable-next-line no-restricted-globals
+    //           location.reload();
+
+    //           console.log("socket my offers : trnsaction confrimed !");
+    //         }
+    //       })
+    //       .on("error", console.error);
+    //   }
+    // } catch (error) {
+    //   console.error(error);
+    // }
   }
 
-  handlerDeleteOne = async (e, offer, index) => {
-    e.preventDefault();
-    try {
-      await api.delete(`offers/${offer._id}`);
 
-      let offers = this.state.offers;
-      offers.splice(index, 1);
-      this.setState({ offers });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-  handlerDeleteAll = async () => {
-    try {
-      const body = {
-        from: JSON.parse(localStorage.getItem("user")).walletAddress
-      };
+  handlerDeleteAll = () => {
+    this.props.deleteAllOffers(this.props.user);
+  }
 
-      await api.post(`offers/delete`, body);
-
-      this.setState({ offers: [] });
-    } catch (error) {
-      console.error(error);
-    }
-  };
 
   render() {
+    const { offers } = this.props;
+
     return (
       <div className="animated fadeIn">
         <Row>
@@ -86,7 +79,7 @@ export default class Offers extends Component {
               <CardBody>
                 <Table hover striped responsive>
                   <thead>
-                    {this.state.offers.length > 0 ? (
+                  {offers.length !== 0 ? (
                       <tr>
                         <th>Offer Id</th>
                         <th>Energy (kwh)</th>
@@ -102,40 +95,9 @@ export default class Offers extends Component {
                     )}
                   </thead>
                   <tbody>
-                    {this.state.offers.map((value, idx) => {
-                      return (
-                        <tr key={value._id}>
-                          <td className="align-middle">{value._id}</td>
-                          <td className="align-middle">
-                            {value.quantity / 1000}
-                          </td>
-                          <td className="align-middle">{value.unitPrice}</td>
-                          <td className="align-middle">
-                            {new Date(value.createdAt).toLocaleString()}
-                          </td>
-                          <td>
-                            {value.status === "Pending" ? (
-                              <Badge color="success">{value.status}</Badge>
-                            ) : (
-                              <Badge color="danger">{value.status}</Badge>
-                            )}
-                          </td>
-
-                          <td className="align-middle">
-                            <Button
-                              color="danger"
-                              outline
-                              onClick={e =>
-                                this.handlerDeleteOne(e, value, idx)
-                              }
-                            >
-                              <i className="cui-trash" />
-                              &nbsp;Delete
-                            </Button>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                  {offers.map((offer, index) => (
+                      <Offer key={index} offer={offer} />
+                  ))}
                   </tbody>
                 </Table>
                 <nav>
@@ -172,3 +134,18 @@ export default class Offers extends Component {
     );
   }
 }
+
+const mapStateToProps = state => ({
+  offers: state.offer.myOffers,
+  loading: state.offer.loading,
+  user: state.auth.user,
+  ctr: state.contact,
+});
+
+export default connect(
+  mapStateToProps,
+  { getMyOffers,deleteAllOffers }
+)(MyOffers)
+
+
+

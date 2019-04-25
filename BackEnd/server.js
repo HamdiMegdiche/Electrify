@@ -11,20 +11,17 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const errorHandler = require('errorhandler');
 const mongoose = require('mongoose');
+const socketIo = require("socket.io");
 
 let app = express();
 let server = require('http').createServer(app);
-let io = require('socket.io')(server);
 
 // connect to mongoDB Remote
-//let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
-
-// connect to mongoDB Local
-const db = require('./config/keys').mongoURI;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING;
 
 mongoose.Promise = global.Promise;
 mongoose
-  .connect(db, {
+  .connect(mongoUrl, {
     useCreateIndex: true,
     useNewUrlParser: true
   })
@@ -69,3 +66,6 @@ server.listen(app.get('port'), error => {
   console.log(`Server Listening at http://localhost:${app.get('port')}/`);
   console.log(`Get all users at http://localhost:${app.get('port')}/api/user`);
 });
+
+const io = socketIo.listen(server);
+require("./routes/arduino")(app,io);

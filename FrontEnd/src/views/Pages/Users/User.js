@@ -1,65 +1,24 @@
 import React, { Component } from "react";
 import { Card, CardBody, CardHeader, Col, Row, Table } from "reactstrap";
-import api from "../../../api";
-
+import { connect } from "react-redux";
+import { getProfile } from "../../../actions/authActions";
 class User extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      id: "",
-      username: "",
-      email: "",
-      createdAt: "",
-      smartHubId: "",
-      walletAddress: ""
-    };
-  }
 
-  //   async setBalanceState() {
-  //     const { web3 } = await getContract();
-  //     const { walletAddress } = JSON.parse(localStorage.getItem("user"));
-  //     const balance = await web3.eth.getBalance(walletAddress);
 
-  //     console.log(balance);
-  //     web3.eth.getBalance("0xB293917D2292C80352F5bF98Fc7AE08E7b6D081D")
-  // .then(console.log);
-  //     this.setState({ balance });
-  //   }
-
-  async componentDidMount() {
-    try {
-      const res = await api.get(`user/wallet/${this.props.match.params.id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
-      if (res.data) {
-        let {
-          _id: id,
-          username,
-          email,
-          createdAt,
-          smartHubId,
-          walletAddress
-        } = res.data;
-        createdAt = new Date(createdAt).toLocaleString();
-
-        this.setState({
-          id,
-          username,
-          email,
-          createdAt,
-          smartHubId,
-          walletAddress
-        });
-
-      } else {
-        this.props.history.push("/404");
-      }
-    } catch (error) {
-      console.log(error);
-      this.props.history.push("/login");
+  componentDidMount() {
+    if (this.props.web3) {
+      this.props.getProfile(this.props.web3, this.props.match.params.id);
     }
   }
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.web3 !== this.props.web3 || nextProps.match.params.id !== this.props.match.params.id) {
+      this.props.getProfile(nextProps.web3, nextProps.match.params.id);
+    }
+  }
+
   render() {
+    const { user } = this.props;
     return (
       <div className="animated fadeIn">
         <Row>
@@ -68,46 +27,46 @@ class User extends Component {
               <CardHeader>
                 <strong>
                   <i className="icon-info pr-1" />
-                  User id: {this.state.id}
+                  User Information:
                 </strong>
               </CardHeader>
               <CardBody>
                 <Table responsive striped hover>
                   <tbody>
-                    <tr key="Id">
-                      <td>{`ID :`}</td>
-                      <td>
-                        <strong>{this.state.id}</strong>
-                      </td>
-                    </tr>
                     <tr key="walet">
                       <td>{`Wallet address :`}</td>
                       <td>
-                        <strong>{this.state.walletAddress}</strong>
+                        <strong>{user.walletAddress}</strong>
                       </td>
                     </tr>
                     <tr key="Idsamrthub">
                       <td>{`SmartHub ID :`}</td>
                       <td>
-                        <strong>{this.state.smartHubId}</strong>
+                        <strong>{user.smartHubId}</strong>
                       </td>
                     </tr>
                     <tr key="username">
                       <td>{`Username :`}</td>
                       <td>
-                        <strong>{this.state.username}</strong>
+                        <strong>{user.username}</strong>
                       </td>
                     </tr>
                     <tr key="email">
                       <td>{`Email :`}</td>
                       <td>
-                        <strong>{this.state.email}</strong>
+                        <strong>{user.email}</strong>
                       </td>
                     </tr>
                     <tr key="registeredAt">
                       <td>{`Registered At :`}</td>
                       <td>
-                        <strong>{this.state.createdAt}</strong>
+                        <strong>{user.createdAt}</strong>
+                      </td>
+                    </tr>
+                    <tr key="bal">
+                      <td>{`Balance  :`}</td>
+                      <td>
+                        <strong>{user.balance} Ether</strong>
                       </td>
                     </tr>
                   </tbody>
@@ -121,4 +80,13 @@ class User extends Component {
   }
 }
 
-export default User;
+const mapStateToProps = state => ({
+  account: state.contract.account,
+  web3: state.contract.web3,
+  user:state.auth.profile,
+});
+
+export default connect(
+  mapStateToProps,
+  {getProfile}
+)(User);
