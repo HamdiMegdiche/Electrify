@@ -43,38 +43,46 @@ class Battery extends Component {
 
   componentDidMount() {
     const batteryFill = this.fill.current;
-    navigator.getBattery().then(battery => {
-      this.setState({ level: battery.level * 100 });
-      this.setState({ fill: battery.level * batteryFill.clientHeight + "px" });
-      this.refreshLevel(battery.level * 100);
+    try {
+      navigator.getBattery().then(battery => {
+        this.setState({ level: battery.level * 100 });
+        this.setState({ fill: battery.level * batteryFill.clientHeight + "px" });
+        this.refreshLevel(battery.level * 100);
 
-      if (battery.charging) {
-        this.setState({ display: "initial" });
-      } else {
-        this.setState({ display: "none" });
-      }
-      battery.addEventListener(
-        "chargingchange",
-        this.chargingChangeHandler,
-        battery
-      );
-      battery.addEventListener("levelchange", this.levelChangeHandler, battery);
-    });
+        if (battery.charging) {
+          this.setState({ display: "initial" });
+        } else {
+          this.setState({ display: "none" });
+        }
+        battery.addEventListener(
+          "chargingchange",
+          this.chargingChangeHandler,
+          battery
+        );
+        battery.addEventListener("levelchange", this.levelChangeHandler, battery);
+        });
+
+    } catch (error) {
+    }
   }
 
   componentWillUnmount() {
-    navigator.getBattery().then(battery => {
-      battery.removeEventListener(
-        "chargingchange",
-        this.chargingChangeHandler,
-        battery
-      );
-      battery.removeEventListener(
-        "levelchange",
-        this.levelChangeHandler,
-        battery
-      );
-    });
+    try {
+      navigator.getBattery().then(battery => {
+        battery.removeEventListener(
+          "chargingchange",
+          this.chargingChangeHandler,
+          battery
+        );
+        battery.removeEventListener(
+          "levelchange",
+          this.levelChangeHandler,
+          battery
+        );
+      });
+    } catch (error) {
+
+    }
   }
 
   render() {

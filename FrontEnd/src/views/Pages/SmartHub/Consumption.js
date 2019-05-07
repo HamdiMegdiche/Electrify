@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Line, Radar } from "react-chartjs-2";
+import { Line, Radar, Bar } from "react-chartjs-2";
 import { Card, CardBody, CardColumns, CardHeader } from "reactstrap";
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import api from "../../../api";
@@ -15,6 +15,20 @@ const options = {
   maintainAspectRatio: false
 };
 
+// const bar = {
+//   labels: ["January", "February", "March", "April", "May", "June", "July"],
+//   datasets: [
+//     {
+//       label: "My First dataset",
+//       backgroundColor: "rgba(255,99,132,0.2)",
+//       borderColor: "rgba(255,99,132,1)",
+//       borderWidth: 1,
+//       hoverBackgroundColor: "rgba(255,99,132,0.4)",
+//       hoverBorderColor: "rgba(255,99,132,1)",
+//       data: [65, 59, 80, 81, 56, 55, 40]
+//     }
+//   ]
+// };
 
 export default class SmartHub extends Component {
   constructor(props) {
@@ -23,13 +37,18 @@ export default class SmartHub extends Component {
     this.state = {
       lineChart: {},
       radarChart: {},
+      barChart: {}
     };
   }
 
   async componentWillMount() {
     try {
+      // console.log(JSON.parse(localStorage.getItem("user")).userName);
       const res = await api
-        .get(`energy/outputDetailNow/5c9b6c0772cdd62e30853c16`)
+        .get(
+          `energy/outputDetailNow/` +
+            JSON.parse(localStorage.getItem("user")).smartHubId
+        )
         .then(_ => {
           myData = _.data;
           var result = [];
@@ -44,14 +63,18 @@ export default class SmartHub extends Component {
             res[value.applianceName].Consumption += value.Consumption;
             return res;
           }, {});
-          
-          const uniqueLabels = [...new Set(myData.map(item => item.applianceName))];
-          const uniqueValues = [...new Set(myData.map(item => item.Consumption))];
+
+          const uniqueLabels = [
+            ...new Set(myData.map(item => item.applianceName))
+          ];
+          const uniqueValues = [
+            ...new Set(myData.map(item => item.Consumption))
+          ];
           myConsumption.push(uniqueValues);
           myLabels.push(uniqueLabels);
-          console.log(myConsumption[0]);
+          // console.log(myConsumption[0]);
           this.state.radarChart = {
-            labels:myLabels[0],
+            labels: myLabels[0],
             datasets: [
               {
                 label: "Appliances",
@@ -91,6 +114,42 @@ export default class SmartHub extends Component {
               }
             ]
           };
+          // BAR
+          // try {
+          //   const resYear = api
+          //     .get(
+          //       `energy/outputYear/` +
+          //         JSON.parse(localStorage.getItem("user")).smartHubId
+          //     )
+          //     .then(_ => {
+          //       myData = _.data;
+
+          //       const uniqueLabels = [
+          //         ...new Set(myData.map(item => item.name))
+          //       ];
+          //       const uniqueValues = [
+          //         ...new Set(myData.map(item => (item.value / 1000).toFixed(3)))
+          //       ];
+          //       const barChart = {
+          //         labels: uniqueLabels,
+          //         datasets: [
+          //           {
+          //             label: "Consumption per month",
+          //             backgroundColor: "rgba(255,99,132,0.2)",
+          //             borderColor: "rgba(255,99,132,1)",
+          //             borderWidth: 1,
+          //             hoverBackgroundColor: "rgba(255,99,132,0.4)",
+          //             hoverBorderColor: "rgba(255,99,132,1)",
+          //             data: uniqueValues
+          //           }
+          //         ]
+          //       };
+          //       this.setState({ barChart });
+          //     });
+          // } catch (error) {
+          //   this.setState({ errorMsg: "Error !", visible: true });
+          // }
+          // BAR
         });
       if (res.data) {
         console.log("Got data!");
@@ -105,27 +164,36 @@ export default class SmartHub extends Component {
       <div className="animated fadeIn">
         <CardColumns className="cols-2">
           <Card>
-            <CardHeader>
-              Line Chart
-            </CardHeader>
+            <CardHeader>Appliance use</CardHeader>
             <CardBody>
               <div className="chart-wrapper">
-                <Line data={this.state.lineChart} options={options} redraw={true} />
+                <Line
+                  data={this.state.lineChart}
+                  options={options}
+                  redraw={true}
+                />
               </div>
             </CardBody>
           </Card>
-
           <Card>
-            <CardHeader>
-              Radar Chart
-            </CardHeader>
+            <CardHeader>Appliance consumption</CardHeader>
             <CardBody>
               <div className="chart-wrapper">
-                <Radar data={this.state.radarChart}/>
+                <Radar data={this.state.radarChart} redraw={true} />
               </div>
             </CardBody>
           </Card>
         </CardColumns>
+        <Card>
+            <CardHeader>
+              Total Consumption per month
+            </CardHeader>
+            <CardBody>
+              <div className="chart-wrapper">
+                <Bar data={this.state.barChart} options={options} />
+              </div>
+            </CardBody>
+          </Card>
       </div>
     );
   }

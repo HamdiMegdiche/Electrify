@@ -72,7 +72,10 @@ export default class RealTime extends Component {
     // Houni 3ayet lil api mta3 l'python wala l'faza hethika.
     try {
       const res = await api
-        .get(`energy/outputNow/5c9b6c0772cdd62e30853c16`)
+        .get(
+          `energy/outputNow/` +
+            JSON.parse(localStorage.getItem("user")).smartHubId
+        )
         .then(_ => {
           myData = _.data;
           for (var i = 0; i <= myData.length - 1; i++) {
@@ -168,22 +171,33 @@ export default class RealTime extends Component {
               }
             }
           };
-            // Change states
-            let calculate = data => data.reduce((a,b) => a + b, 0);
-            this.state.production = (calculate(myProduction) / 100).toFixed(3);
-            this.state.consumption = (calculate(myConsumption)/100).toFixed(3);
-            if(this.state.production > this.state.consumption)
-            {
-              this.state.ratio = ((this.state.consumption / this.state.production)* 100).toFixed(2) ;
-            } else {
-              this.state.ratio = ((this.state.production / this.state.consumption)* 100).toFixed(2);
-            }    
-            this.state.lostEnergy = (calculate(lost) / 100 / 2).toFixed(3);
-            this.state.energyFromGrid = (calculate(grid) / 100).toFixed(3);
-            this.state.lostEnergyPerc = ((this.state.lostEnergy / this.state.production)* 100).toFixed(2);
-            this.state.gridPerc = ((this.state.energyFromGrid / this.state.consumption)* 100).toFixed(2);
-            this.state.date = new Date();
-            // Change states
+          // Change states
+          let calculate = data => data.reduce((a, b) => a + b, 0);
+          this.state.production = (calculate(myProduction) / 100).toFixed(3);
+          this.state.consumption = (calculate(myConsumption) / 100).toFixed(3);
+          if (this.state.production > this.state.consumption) {
+            this.state.ratio = (
+              (this.state.consumption / this.state.production) *
+              100
+            ).toFixed(2);
+          } else {
+            this.state.ratio = (
+              (this.state.production / this.state.consumption) *
+              100
+            ).toFixed(2);
+          }
+          this.state.lostEnergy = (calculate(lost) / 100 / 2).toFixed(3);
+          this.state.energyFromGrid = (calculate(grid) / 100).toFixed(3);
+          this.state.lostEnergyPerc = (
+            (this.state.lostEnergy / this.state.production) *
+            100
+          ).toFixed(2);
+          this.state.gridPerc = (
+            (this.state.energyFromGrid / this.state.consumption) *
+            100
+          ).toFixed(2);
+          this.state.date = new Date();
+          // Change states
         });
       if (res.data) {
         console.log("Got data!");
@@ -201,7 +215,10 @@ export default class RealTime extends Component {
     // Chouf hethi ya skan
     try {
       const res = await api
-        .get(`energy/outputNow/5c9b6c0772cdd62e30853c16`)
+        .get(
+          `energy/outputNow/` +
+            JSON.parse(localStorage.getItem("user")).smartHubId
+        )
         .then(_ => {
           myData = _.data;
           for (var i = 0; i <= myData.length - 1; i++) {
@@ -297,22 +314,33 @@ export default class RealTime extends Component {
               }
             }
           };
-            // Change states
-            let calculate = data => data.reduce((a,b) => a + b, 0);
-            this.state.production = (calculate(myProduction) / 100).toFixed(3);
-            this.state.consumption = (calculate(myConsumption)/100).toFixed(3);
-            if(this.state.production > this.state.consumption)
-            {
-              this.state.ratio = ((this.state.consumption / this.state.production)* 100).toFixed(2) ;
-            } else {
-              this.state.ratio = ((this.state.production / this.state.consumption)* 100).toFixed(2);
-            }
-            this.state.lostEnergy = (calculate(lost) / 100 / 2).toFixed(3);
-            this.state.energyFromGrid = (calculate(grid) / 100).toFixed(3);
-            this.state.lostEnergyPerc = ((this.state.lostEnergy / this.state.production)* 100).toFixed(2);
-            this.state.gridPerc = ((this.state.energyFromGrid / this.state.consumption)* 100).toFixed(2);
-            this.state.date = new Date();
-            // Change states
+          // Change states
+          let calculate = data => data.reduce((a, b) => a + b, 0);
+          this.state.production = (calculate(myProduction) / 100).toFixed(3);
+          this.state.consumption = (calculate(myConsumption) / 100).toFixed(3);
+          if (this.state.production > this.state.consumption) {
+            this.state.ratio = (
+              (this.state.consumption / this.state.production) *
+              100
+            ).toFixed(2);
+          } else {
+            this.state.ratio = (
+              (this.state.production / this.state.consumption) *
+              100
+            ).toFixed(2);
+          }
+          this.state.lostEnergy = (calculate(lost) / 100 / 2).toFixed(3);
+          this.state.energyFromGrid = (calculate(grid) / 100).toFixed(3);
+          this.state.lostEnergyPerc = (
+            (this.state.lostEnergy / this.state.production) *
+            100
+          ).toFixed(2);
+          this.state.gridPerc = (
+            (this.state.energyFromGrid / this.state.consumption) *
+            100
+          ).toFixed(2);
+          this.state.date = new Date();
+          // Change states
         });
       if (res.data) {
         console.log("Got data!");
@@ -350,7 +378,9 @@ export default class RealTime extends Component {
               <Row>
                 <Col sm="5">
                   <CardTitle className="mb-0">Real-Time Energy</CardTitle>
-                  <div className="small text-muted">{this.state.date.toLocaleTimeString()}</div>
+                  <div className="small text-muted">
+                    {this.state.date.toLocaleTimeString()}
+                  </div>
                 </Col>
                 <Col sm="7" className="d-none d-sm-inline-block">
                   <Button color="primary" className="float-right">
@@ -399,10 +429,13 @@ export default class RealTime extends Component {
                     value={this.state.ratio}
                   />
                 </Col>
-               
+
                 <Col sm={12} md className="mb-sm-2 mb-0">
                   <div className="text-muted">Lost Energy</div>
-                  <strong> {this.state.lostEnergy} Watts ({this.state.lostEnergyPerc}%)</strong>
+                  <strong>
+                    {" "}
+                    {this.state.lostEnergy} Watts ({this.state.lostEnergyPerc}%)
+                  </strong>
                   <Progress
                     className="progress-xs mt-2"
                     color="danger"
@@ -411,7 +444,9 @@ export default class RealTime extends Component {
                 </Col>
                 <Col sm={12} md className="mb-sm-2 mb-0">
                   <div className="text-muted">Grid Energy</div>
-                  <strong>{this.state.energyFromGrid} Watts ({this.state.gridPerc}%)</strong>
+                  <strong>
+                    {this.state.energyFromGrid} Watts ({this.state.gridPerc}%)
+                  </strong>
                   <Progress
                     className="progress-xs mt-2"
                     color="warning"

@@ -29,7 +29,7 @@ class OfferForm extends Component {
     this.toggleFade = this.toggleFade.bind(this);
     this.state = {
       messageArduino : "Please Authenticate Via RFID to Activate prosumer mode.",
-      showBtn: true,
+      showBtn: false,
       color:"danger",
       collapse: true,
       fadeIn: true,
@@ -128,7 +128,7 @@ class OfferForm extends Component {
     this.setState({ quantity: 0, total: 0, unitPrice: 0, visible: false });
   };
 
-    
+
   componentDidMount() {
     const {user} = this.props;
     const socket = socketIOClient("http://localhost:4000", { transports: ['websocket'] });
