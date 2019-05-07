@@ -8,76 +8,54 @@ import {
   ListGroup,
   ListGroupItem,
   Row,
-  Button,
-  Alert
+  Progress
 } from "reactstrap";
+import { getOffers,getMyOffers } from "../../../actions/offerActions";
+import { getTransactions } from "../../../actions/transactionsActions";
+import { Doughnut, Pie } from 'react-chartjs-2';
 
 import {connect} from "react-redux";
-import { Train, Model, Dense, Conv2D, MaxPooling2D, Flatten } from 'tfjsx';
-import mnist from 'mnist';
-import * as tf from '@tensorflow/tfjs';
 
+const doughnut = {
+  labels: [
+    'Ether spent',
+    'Ether gained',
+  ],
+  datasets: [
+    {
+      data: [300, 200],
+      backgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+      ],
+      hoverBackgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+      ],
+    }],
+};
 
-
-const data = mnist.set(1500, 100);
-const train = data.training;
-const test = data.test;
-
-function* mnistTrainDataGenerator() {
-  for (let sample of train) {
-    yield { x: tf.tensor1d(sample.input).reshape([28, 28, 1]), y: sample.output };
-  }
-}
-
-function* mnistTestDataGenerator() {
-  for (let sample of test) {
-    yield { x: tf.tensor1d(sample.input).reshape([28, 28, 1]), y: sample.output };
-  }
-}
-
-
-class MnistModel extends React.Component {
-  render() {
-    return (
-      <Train
-        trainData={mnistTrainDataGenerator}
-        samples={1500}
-        validationData={mnistTestDataGenerator}
-        onBatchEnd={this.props.onBatchEnd}
-        epochs={5}
-        batchSize={64}
-        onTrainEnd={this.props.onTrainEnd}
-        train={this.props.train}
-        display
-      >     
-        
-        <Model
-          optimizer={tf.train.sgd(0.15)}
-          loss='categoricalCrossentropy'
-          metrics={['accuracy']}>
-          <Conv2D
-            inputShape={[28, 28, 1]}
-            kernelSize={5}
-            filters={8}
-            strides={1}
-            activation='relu'
-            kernelInitializer='VarianceScaling' />
-          <MaxPooling2D poolSize={[2, 2]} strides={[2, 2]} />
-          <Conv2D
-            kernelSize={5}
-            filters={16}
-            strides={1}
-            activation='relu'
-            kernelInitializer='VarianceScaling' />
-          <MaxPooling2D poolSize={[2, 2]} strides={[2, 2]} />
-          <Flatten />
-          <Dense units={10} kernelInitializer='VarianceScaling' activation='softmax' />
-          </Model>
-          </Train>
-    );
-  }
-}
-
+const pie = {
+  labels: [
+    'Local Consumption',
+    'Production',
+    'Retail Consumption',
+  ],
+  datasets: [
+    {
+      data: [300, 50, 100],
+      backgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+      ],
+      hoverBackgroundColor: [
+        '#FF6384',
+        '#36A2EB',
+        '#FFCE56',
+      ],
+    }],
+};
 
 class OfferAnalytics extends Component {
 
@@ -96,47 +74,69 @@ class OfferAnalytics extends Component {
   handlerMakeOffer = () => {
     this.props.history.push("/offers/make-offer");
   };
+
   handlerMyOffers = () => {
     this.props.history.push("/offers/my-offers");
   };
-  componentWillMount() {}
-  render() {
 
-    const testDigits = [1,3,4];
+  calculateSum = (array) => {
+    const avg = array.reduce(
+      (sum, a) => {
+        return sum + Number(a.unitPrice)
+      }, 0) / (array.length || 1);
+    return Number(avg).toFixed(3);
+  }
+  calculateSold = (array) => {
+    const avg = array.reduce(
+      (sum, a) => {
+        return sum + Number(a.quantity)
+      }, 0) / (array.length || 1);
+      return Number(avg).toFixed(3);
 
-//Randomly selects a test digit, ideally this is drawn from the val
-  //  set. But it's just random for now.
-    const test = tf.stack(testDigits.map(digit => {
-      return tf.tensor1d(mnist[digit].get()).reshape([28, 28, 1]);
-    }))
+  }
 
-   const predict = () => {
-      const probTensor = this.state.model.predict(test);
-      const probArr = probTensor.dataSync();
-      this.setState({
-        predicted: testDigits.map((digit, i) => {
-          return (
-            <Alert className="ml-2 mt-2" color="info" key={i}>
-              Sample {i+1} is Offer {digit} with
-              {' ' + Math.round(probArr[i * 10 + digit] * 100)}%
-              confidence.
-            </Alert>
-          );
-        }),
-      });
+
+  componentWillMount() {
+    this.props.getOffers();
+    const {user} = this.props;
+    this.props.getMyOffers(user.walletAddress);
+    if (this.props.contract) {
+      this.props.getTransactions(this.props.contract, this.props.web3, this.props.account);
     }
 
-   // const test = tf.tensor([ 1, 3, 25, 99 ], [4, 1]);
+  }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.contract !== this.props.contract) {
+      this.props.getTransactions(nextProps.contract, nextProps.web3, nextProps.account);
+    }
+  }
+
+  render() {
     return (
       <div className="animated fadeIn">
         <Row>
+        <Col sm="12" xl="12">
+        <Card>
+          <CardHeader>
+                <i className="fa fa-align-justify"></i>
+                <strong>Progress</strong>
+                <small> Analytics</small>
+          </CardHeader>
+          <CardBody>
+                <Progress color="success" value={this.calculateSum(this.props.trans.transactions) * 10} className="mb-3">Price of Kwh {this.calculateSum(this.props.trans.transactions)} Ether</Progress>
+                <Progress color="info" value={this.props.myTrans.length * 5} className="mb-3">Number of my transactions {this.props.myTrans.length}</Progress>
+            <Progress color="warning" value={this.calculateSold(this.props.myTrans) * 30} className="mb-3">sold energy</Progress>
+            <Progress color="danger" value={this.calculateSold(this.props.trans.transactions) * 30} className="mb-3">baught energy</Progress>
+          </CardBody>
+            </Card>
+            </Col>
           <Col sm="12" xl="12">
             <Card>
               <CardHeader>
                 <i className="fa fa-align-justify" />
                 <strong>List Group</strong>
-                <small> tags</small>
+                <small> offers</small>
               </CardHeader>
               <CardBody>
                 <ListGroup>
@@ -156,32 +156,31 @@ class OfferAnalytics extends Component {
               </CardBody>
             </Card>
           </Col>
-          <Col sm="12" xl="12">
+          <Col sm="6" xl="6">
           <Card>
-              <CardHeader>
-                <i className="fa fa-align-justify" />
-                <strong>Best 3 offers</strong>
-              </CardHeader>
-              <CardBody>
-              {this.state.predicted}
-              </CardBody>
-              </Card>
+            <CardHeader>
+              Energy
+            </CardHeader>
+            <CardBody>
+              <div className="chart-wrapper">
+                <Pie data={pie} />
+              </div>
+            </CardBody>
+            </Card>
             </Col>
+            <Col sm="6" xl="6">
 
-          <Col sm="12" xl="12">
-        <Button className="ml-2" color="secondary" onClick={() => this.setState({ training: !this.state.training })}>
-          {this.state.training ? 'Pause Training' : 'Start Training'}
-        </Button>
-        {this.state.trained && (
-              <Button className="ml-2 " color="primary" onClick={predict}>
-              Predict
-            </Button>
-        )}
-        <MnistModel
-          onTrainEnd={model => this.setState({ model })}
-          onBatchEnd={(metrics, model) => this.setState({ model, trained: true })}
-          train={this.state.training}/>
-          </Col>
+          <Card>
+            <CardHeader>
+              Blockchain Transactions
+            </CardHeader>
+            <CardBody>
+              <div className="chart-wrapper">
+                <Doughnut data={doughnut} />
+              </div>
+            </CardBody>
+            </Card>
+            </Col>
         </Row>
 
       </div>
@@ -192,9 +191,12 @@ class OfferAnalytics extends Component {
 const mapStateToProps = state => ({
   offers: state.offer.offers,
   myOffers: state.offer.myOffers,
-  trans: state.offer.transactions,
-  myTrans: state.offer.myTransactions,
-  user: state.auth.user
+  trans: state.trans,
+  myTrans: state.trans.myTransactions,
+  user: state.auth.user,
+  account: state.contract.account,
+  web3: state.contract.web3,
+  contract: state.contract.contract,
 });
 
-export default connect(mapStateToProps)(OfferAnalytics);
+export default connect(mapStateToProps,{getOffers,getMyOffers,getTransactions})(OfferAnalytics);

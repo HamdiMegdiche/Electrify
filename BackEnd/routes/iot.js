@@ -8,7 +8,7 @@ router.get('/', (req, res) => {
       return res.json(users);
     });
   });
-  http://localhost:4000/api/iot/Consumption-rpi/55555
+  //http://localhost:4000/api/iot/Consumption-rpi/55555
   router.post('/Consumption-rpi/:consumption', function(req, res, next) {
     var Consumptionrpi_val= req.params.consumption;
   // var  consum= Consumption_rpi

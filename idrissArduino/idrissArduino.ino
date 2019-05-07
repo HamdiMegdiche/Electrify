@@ -9,9 +9,9 @@
 #include <LiquidCrystal_I2C.h>
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-IPAddress server(192,168,1,12);
-char ssid[] = "TOPNET_91B8"; // your network SSID (name)
-char pass[] = "vphmc5n8h6"; // your network password
+IPAddress server(172,20,10,4);
+char ssid[] = "Ska"; // your network SSID (name)
+char pass[] = "skander2"; // your network password
 int status = WL_IDLE_STATUS; // the Wifi radio's status
 //char server[] =  "172.20.10.5";
 // Initialize the Ethernet client object

@@ -64,14 +64,14 @@ export const setTransLoading = () => {
 
 export const getTransactions = (contract,web3,account) => dispatch => {
 
-
   const transactions = [];
   dispatch(setTransLoading());
   contract.methods.transCount().call().then( async (nbrTrans) => {
-
+    console.log(nbrTrans);
     for (let i = 0; i < nbrTrans; i++) {
       const tr = await contract.methods.transactions(i).call()
-  
+      console.log(tr);
+
       const trans = {
         from: tr[0],
         to: tr[1],

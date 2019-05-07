@@ -46,6 +46,7 @@ class Dashboard extends Component {
       production: 0,
       consumption: 0,
       battery: 0,
+      consumption_avg: [],
       cardChartData1: {},
       cardChartOpts1: {},
       cardChartData2: {},
@@ -61,13 +62,29 @@ class Dashboard extends Component {
     };
   }
 
+ updateConsumtionAvg = () => {
+  axios.get(`http://localhost:4000/api/iot/consumption`).then((resWeather) => 
+  {
+    let somme =0;
+    resWeather.data.forEach((obj)=>{
+       somme = somme  + Number(obj.consumption);
+    })
 
+    somme = somme / resWeather.data.length;
+        this.setState({consumption_avg:Number(somme).toFixed(2)});
+        })
+        .catch (error => {
+         console.log("Catch from getting initial data consumption (not connected) ");
+      
+      });
+ }
 
  async componentWillMount() {
 
     this.interval = setInterval(() => this.updateChart(), 60000);
     this.interval = setInterval(() =>  this.updateWeather(), 5000);
     this.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
+    this.interval = setInterval(() =>  this.updateConsumtionAvg(), 5000);
 
 
     myProduction = [];
@@ -307,9 +324,19 @@ class Dashboard extends Component {
       this.setState({humidity: 1254});
       this.setState({temperature: 1254});
       this.setState({consumption_rasp: 1254});      
-      this.interval = setInterval(() =>  this.updateWeather(), 2000);
+     // this.interval = setInterval(() =>  this.updateWeather(), 2000);
+ 
     });
-//-------------------------Consumption------------------------------
+//----------------------------all consumption---------------------------
+
+
+
+this.updateConsumtionAvg();
+  
+
+
+
+    //-------------------------Consumption------------------------------
 axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) => 
 {
         console.log("Get inital data done");
@@ -319,7 +346,7 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
        console.log("Catch from getting initial data consumption (not connected) ");
       // console.log(error);
       this.setState({consumption_rasp: 1254});      
-      this.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
+      //this.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
     });
   }
 
@@ -335,13 +362,13 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
             
             })
             .catch (error => {
-             console.log("Catch from getting update data (not connected) -10000");
-             console.log(error);
+             console.log("Catch from getting update data weather (not connected) -10000");
+            // console.log(error);
             this.setState({humidity: -10000});
             this.setState({temperature: -10000});
          });     
     } catch (error) {
- console.log(error);     
+ //console.log(error);     
     }
   }
 //--------------------------update consumpton ----------
@@ -354,13 +381,14 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
             })
             .catch (error => {
              console.log("Catch from getting update data consumption (not connected) -10000");
-             console.log(error);
+            // console.log(error);
             this.setState({consumption_rasp: -10000});      
            
           });     
     } catch (error) {
- console.log(error);     
+ //console.log(error);     
     }
+    
   }
 //----------------------------------------------------------end skander ----------------------------------
   async updateChart() {
@@ -721,7 +749,7 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
               <CardBody className="pb-0 card-body">
                 <div className="text-value weather">
                 <h3>{this.state.temperature}°C</h3>
-                <h2>Temperature</h2>
+                <h4>Temperature</h4>
                 </div>
               </CardBody>
             </Card>
@@ -732,7 +760,7 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
               <CardBody className="pb-0 card-body">
                 <div className="text-value weather">
                 <h3>{this.state.humidity}%</h3>
-                <h2>Humidity</h2>
+                <h4>Humidity</h4>
                 </div>
               </CardBody>
             </Card>
@@ -743,7 +771,18 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
               <CardBody className="pb-0 card-body">
                 <div className="text-value weather">
                 <h3>{this.state.consumption_rasp}Watt</h3>
-                <h2>Consumption</h2>
+                <h5>Consumption real time</h5>
+                </div>
+              </CardBody>
+            </Card>
+          </Col>
+          <Col  xs="12" sm="6" lg="3">
+            <Card style={{maxHeight:100}} className="text-white bg-danger">
+              <CardBody className="pb-0 card-body">
+                <div className="text-value weather">
+                <h3>{ this.state.consumption_avg
+          }Watt</h3>
+                <h5>Consumption average</h5>
                 </div>
               </CardBody>
             </Card>

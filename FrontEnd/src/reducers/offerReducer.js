@@ -52,7 +52,8 @@ export default function(state = initialState, action) {
     case DELETE_OFFER:
       return {
         ...state,
-        offers: state.offers.filter(offer => offer._id !== action.payload)
+        offers: state.offers.filter(offer => offer._id !== action.payload),
+        myOffers: state.myOffers.filter(offer => offer._id !== action.payload)
       };
     case DELETE_ALL_OFFERS:
       return {
