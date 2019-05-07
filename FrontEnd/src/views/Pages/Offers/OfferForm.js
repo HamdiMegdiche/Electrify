@@ -3,7 +3,8 @@ import etherLogo from "../../../assets/ether.jpeg";
 import { addOffer } from "../../../actions/offerActions";
 import { connect } from "react-redux";
 import socketIOClient from "socket.io-client";
-
+import toaster from "toasted-notes";
+import beep from "../../../assets/access.wav";
 import {
   Button,
   Card,
@@ -40,7 +41,6 @@ class OfferForm extends Component {
       total: 2
     };
   }
-
   onDismiss = () => {
     this.setState({ visible: false });
   };
@@ -78,7 +78,12 @@ class OfferForm extends Component {
     });
   };
 
-
+   notify = user => {
+    new Audio(beep).play();
+    toaster.notify("Thank you "+user.username+", You can make an offer", {
+    position: 'top-right',
+  });
+  }
 
   handlerMakeOffer = e => {
 
@@ -117,14 +122,6 @@ class OfferForm extends Component {
     this.props.history.push("/my-offers");
   };
 
-  // componentWillReceiveProps(nextProps) {
-  //   if (nextProps.errors) {
-  //     this.setState({
-  //       message: nextProps.errors.message,
-  //       visible: nextProps.errors.visible 
-  //     });
-  //   }
-  // }
 
   handlerCancelMakeOffer = e => {
     e.preventDefault();
@@ -139,6 +136,8 @@ class OfferForm extends Component {
       console.log('data:', data)
 
       if (data._id === user.id) {
+        this.notify(user);
+
         this.setState({
           showBtn: false,
           color: "success",

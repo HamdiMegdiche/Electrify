@@ -16,7 +16,7 @@ import {
 
 import { connect } from "react-redux";
 import Offer from "./../../components/Offer";
-import { getOffers,searchOffers } from "../../../actions/offerActions";
+import { getOffers, searchOffers } from "../../../actions/offerActions";
 
 class Offers extends Component {
 
