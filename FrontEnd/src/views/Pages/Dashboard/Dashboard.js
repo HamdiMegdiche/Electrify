@@ -3,6 +3,7 @@ import { Line } from "react-chartjs-2";
 import Battery from "../../components/Battery";
 import api from "../../../api";
 import axios from "axios";
+import socketIOClient from "socket.io-client";
 
 import {
   ButtonDropdown,
@@ -82,9 +83,10 @@ class Dashboard extends Component {
  async componentWillMount() {
 
     this.interval = setInterval(() => this.updateChart(), 60000);
-    this.interval = setInterval(() =>  this.updateWeather(), 5000);
-    this.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
+    //this.interval = setInterval(() =>  this.updateWeather(), 5000);
+    //.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
     this.interval = setInterval(() =>  this.updateConsumtionAvg(), 5000);
+    const socket = socketIOClient("http://localhost:4000", { transports: ['websocket'] });
 
 
     myProduction = [];
@@ -311,7 +313,21 @@ class Dashboard extends Component {
 
     // ---------------------------- weather skander------------------------------------------------------
     console.log("Get initial data ");
-  //------------------------Weather -------------
+    //----------------------weather and consumption socket ------------------------------------------------
+    socket.on("FromAPI", data => {
+      console.log('data:', data)
+      if (data.temp=='None')
+      {
+        this.setState({humidity: '000'});
+        this.setState({temperature: '000'});
+        this.setState({consumption_rasp: '000'});
+      }
+      this.setState({humidity: parseFloat(data.humi).toFixed(2)});
+      this.setState({temperature: parseFloat(data.temp).toFixed(2)});
+      this.setState({consumption_rasp: parseFloat(data.cons).toFixed(3)});
+    });
+ /*
+    //------------------------Weather -------------
        axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) => 
 {
         console.log("Get inital data done");
@@ -327,6 +343,7 @@ class Dashboard extends Component {
      // this.interval = setInterval(() =>  this.updateWeather(), 2000);
  
     });
+    */
 //----------------------------all consumption---------------------------
 
 
@@ -335,7 +352,7 @@ this.updateConsumtionAvg();
   
 
 
-
+/*
     //-------------------------Consumption------------------------------
 axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) => 
 {
@@ -388,7 +405,7 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
     } catch (error) {
  //console.log(error);     
     }
-    
+    */
   }
 //----------------------------------------------------------end skander ----------------------------------
   async updateChart() {
