@@ -82,9 +82,7 @@ class Login extends Component {
                     <Form onSubmit={(e) => this.onSubmit(e)}>
                       <h1>Login</h1>
                       <p className="text-muted">Sign In to your account</p>
-                      <p className="text-muted">
-                        Login: hamdi / Password: test
-                      </p>
+
 
                       <InputGroup className="mb-3">
                         <InputGroupAddon addonType="prepend">
