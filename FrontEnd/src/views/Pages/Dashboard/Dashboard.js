@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Line } from "react-chartjs-2";
 import Battery from "../../components/Battery";
 import api from "../../../api";
-import axios from "axios";
 import socketIOClient from "socket.io-client";
 
 import {
@@ -64,7 +63,7 @@ class Dashboard extends Component {
   }
 
  updateConsumtionAvg = () => {
-  axios.get(`http://52.50.193.34:4000/api/iot/consumption`).then((resWeather) =>
+  api.get(`iot/consumption`).then((resWeather) =>
   {
     let somme =0;
     resWeather.data.forEach((obj)=>{
@@ -83,10 +82,8 @@ class Dashboard extends Component {
  async componentWillMount() {
 
     this.interval = setInterval(() => this.updateChart(), 60000);
-    //this.interval = setInterval(() =>  this.updateWeather(), 5000);
-    //.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
     this.interval = setInterval(() =>  this.updateConsumtionAvg(), 5000);
-    const socket = socketIOClient("http://52.50.193.34:4000", { transports: ['websocket'] });
+    const socket = socketIOClient(process.env.REACT_APP_backend_url, { transports: ['websocket'] });
 
 
     myProduction = [];

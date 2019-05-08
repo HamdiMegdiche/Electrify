@@ -1,13 +1,13 @@
 import axios from 'axios';
 const api = axios.create({
-  baseURL: `http://52.50.193.34:4000/api/`
+  baseURL: `${process.env.REACT_APP_backend_url}/api/`
 });
 api.interceptors.request.use(function(config) {
   const token = localStorage.getItem("token");
 
   if ( token != null ) {
     const headers = {
-      "Authorization": `Bearer ${localStorage.getItem("token")}`,
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json"
     }
     config.headers = headers;
@@ -15,7 +15,7 @@ api.interceptors.request.use(function(config) {
 
   return config;
 }, function (err) {
-    console.log('teset'+err)
+    console.log('Error connection to backend : '+err)
   return Promise.reject(err);
 });
 
