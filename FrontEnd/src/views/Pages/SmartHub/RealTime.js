@@ -16,6 +16,7 @@ import {
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import { getStyle, hexToRgba } from "@coreui/coreui/dist/js/coreui-utilities";
 import api from "../../../api";
+import { connect } from "react-redux";
 
 const brandSuccess = getStyle("--success");
 const brandInfo = getStyle("--info");
@@ -457,3 +458,13 @@ export default class RealTime extends Component {
     );
   }
 }
+
+
+const mapStateToProps = state => ({
+  user: state.auth.user,
+
+});
+
+export default connect(
+  mapStateToProps
+)(SmartHub);
