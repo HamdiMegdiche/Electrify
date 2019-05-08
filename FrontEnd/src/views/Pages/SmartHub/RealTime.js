@@ -36,7 +36,7 @@ var max2 = 0;
 var max3 = 0;
 var maxValue = 0;
 
-export default class RealTime extends Component {
+class RealTime extends Component {
   constructor(props) {
     super(props);
 
