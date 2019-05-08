@@ -64,7 +64,7 @@ class Dashboard extends Component {
   }
 
  updateConsumtionAvg = () => {
-  axios.get(`http://localhost:4000/api/iot/consumption`).then((resWeather) => 
+  axios.get(`http://localhost:4000/api/iot/consumption`).then((resWeather) =>
   {
     let somme =0;
     resWeather.data.forEach((obj)=>{
@@ -76,7 +76,7 @@ class Dashboard extends Component {
         })
         .catch (error => {
          console.log("Catch from getting initial data consumption (not connected) ");
-      
+
       });
  }
 
@@ -316,7 +316,7 @@ class Dashboard extends Component {
     //----------------------weather and consumption socket ------------------------------------------------
     socket.on("FromAPI", data => {
       console.log('data:', data)
-      if (data.temp=='None')
+      if (data.temp ==='None')
       {
         this.setState({humidity: '000'});
         this.setState({temperature: '000'});
@@ -328,7 +328,7 @@ class Dashboard extends Component {
     });
  /*
     //------------------------Weather -------------
-       axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) => 
+       axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) =>
 {
         console.log("Get inital data done");
         this.setState({humidity: resWeather.data.humidity.toFixed(2)});
@@ -339,9 +339,9 @@ class Dashboard extends Component {
       // console.log(error);
       this.setState({humidity: 1254});
       this.setState({temperature: 1254});
-      this.setState({consumption_rasp: 1254});      
+      this.setState({consumption_rasp: 1254});
      // this.interval = setInterval(() =>  this.updateWeather(), 2000);
- 
+
     });
     */
 //----------------------------all consumption---------------------------
@@ -349,12 +349,12 @@ class Dashboard extends Component {
 
 
 this.updateConsumtionAvg();
-  
+
 
 
 /*
     //-------------------------Consumption------------------------------
-axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) => 
+axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
 {
         console.log("Get inital data done");
         this.setState({consumption_rasp: resWeather.data.watts.toFixed(2)});
@@ -362,48 +362,48 @@ axios.get(`http://172.20.10.7:5000/consumption`).then((resWeather) =>
       .catch (error => {
        console.log("Catch from getting initial data consumption (not connected) ");
       // console.log(error);
-      this.setState({consumption_rasp: 1254});      
+      this.setState({consumption_rasp: 1254});
       //this.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
     });
   }
 
-  
-//--------------------------update weather -------------- 
+
+//--------------------------update weather --------------
    updateWeather() {
     console.log('Get data updated each 5 s');
     try {
-      axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) => 
+      axios.get(`http://172.20.10.7:5000/weather`).then((resWeather) =>
       {
               this.setState({humidity: resWeather.data.humidity.toFixed(2)});
               this.setState({temperature: resWeather.data.temperature.toFixed(2)});
-            
+
             })
             .catch (error => {
              console.log("Catch from getting update data weather (not connected) -10000");
             // console.log(error);
             this.setState({humidity: -10000});
             this.setState({temperature: -10000});
-         });     
+         });
     } catch (error) {
- //console.log(error);     
+ //console.log(error);
     }
   }
 //--------------------------update consumpton ----------
   updateconsumptionrasp() {
     console.log('Get data updated each 1 s');
     try {
-      axios.get(`http://172.20.10.7:5000/consumption`).then((consump) => 
+      axios.get(`http://172.20.10.7:5000/consumption`).then((consump) =>
       {
               this.setState({consumption_rasp: consump.data.watts.toFixed(2)});
             })
             .catch (error => {
              console.log("Catch from getting update data consumption (not connected) -10000");
             // console.log(error);
-            this.setState({consumption_rasp: -10000});      
-           
-          });     
+            this.setState({consumption_rasp: -10000});
+
+          });
     } catch (error) {
- //console.log(error);     
+ //console.log(error);
     }
     */
   }
