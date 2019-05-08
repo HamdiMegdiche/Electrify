@@ -64,7 +64,7 @@ class Dashboard extends Component {
   }
 
  updateConsumtionAvg = () => {
-  axios.get(`http://localhost:4000/api/iot/consumption`).then((resWeather) =>
+  axios.get(`http://52.50.193.34:4000/api/iot/consumption`).then((resWeather) =>
   {
     let somme =0;
     resWeather.data.forEach((obj)=>{
@@ -86,7 +86,7 @@ class Dashboard extends Component {
     //this.interval = setInterval(() =>  this.updateWeather(), 5000);
     //.interval = setInterval(() =>  this.updateconsumptionrasp(), 2000);
     this.interval = setInterval(() =>  this.updateConsumtionAvg(), 5000);
-    const socket = socketIOClient("http://localhost:4000", { transports: ['websocket'] });
+    const socket = socketIOClient("http://52.50.193.34:4000", { transports: ['websocket'] });
 
 
     myProduction = [];
