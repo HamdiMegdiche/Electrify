@@ -10,7 +10,7 @@ module.exports = {
       websockets: true
     },
     remote: {
-      host: process.env.REACT_APP_serverip,
+      host: "52.50.193.34",
       port: 9501,
       network_id: "1515",
       websockets: true
