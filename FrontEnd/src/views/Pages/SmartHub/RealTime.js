@@ -74,8 +74,8 @@ export default class RealTime extends Component {
       const res = await api
         .get(
           `energy/outputNow/` +
-            JSON.parse(localStorage.getItem("user")).smartHubId
-        )
+          this.props.user.smartHubId
+          )
         .then(_ => {
           myData = _.data;
           for (var i = 0; i <= myData.length - 1; i++) {
@@ -217,8 +217,8 @@ export default class RealTime extends Component {
       const res = await api
         .get(
           `energy/outputNow/` +
-            JSON.parse(localStorage.getItem("user")).smartHubId
-        )
+          this.props.user.smartHubId
+          )
         .then(_ => {
           myData = _.data;
           for (var i = 0; i <= myData.length - 1; i++) {

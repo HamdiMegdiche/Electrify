@@ -3,6 +3,8 @@ import { Line, Radar, Bar } from "react-chartjs-2";
 import { Card, CardBody, CardColumns, CardHeader } from "reactstrap";
 import { CustomTooltips } from "@coreui/coreui-plugin-chartjs-custom-tooltips";
 import api from "../../../api";
+import { connect } from "react-redux";
+
 let myData;
 var myConsumption = [];
 var myLabels = [];
@@ -30,7 +32,7 @@ const options = {
 //   ]
 // };
 
-export default class SmartHub extends Component {
+ class SmartHub extends Component {
   constructor(props) {
     super(props);
 
@@ -47,7 +49,7 @@ export default class SmartHub extends Component {
       const res = await api
         .get(
           `energy/outputDetailNow/` +
-            JSON.parse(localStorage.getItem("user")).smartHubId
+            this.props.user.smartHubId
         )
         .then(_ => {
           myData = _.data;
@@ -198,3 +200,13 @@ export default class SmartHub extends Component {
     );
   }
 }
+
+
+const mapStateToProps = state => ({
+  user: state.auth.user,
+
+});
+
+export default connect(
+  mapStateToProps
+)(SmartHub);
