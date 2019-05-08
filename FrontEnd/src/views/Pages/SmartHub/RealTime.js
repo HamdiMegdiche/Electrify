@@ -396,7 +396,7 @@ export default class RealTime extends Component {
                   data={this.state.mainChart}
                   options={this.state.mainChartOpts}
                   height={300}
-                  redraw="true"
+                  redraw={true}
                 />
               </div>
             </CardBody>
