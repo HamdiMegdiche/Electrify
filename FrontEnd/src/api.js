@@ -1,6 +1,6 @@
 import axios from 'axios';
 const api = axios.create({
-  baseURL: `http://localhost:4000/api/`
+  baseURL: `http://52.50.193.34:4000/api/`
 });
 api.interceptors.request.use(function(config) {
   const token = localStorage.getItem("token");

@@ -16,7 +16,7 @@ const store = createStore(
   initialState,
   compose(
     applyMiddleware(...middleware,sagaMiddleware),
-    window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+    // window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
   )
 );
 sagaMiddleware.run(rootSaga);

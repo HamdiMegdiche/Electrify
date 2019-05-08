@@ -10,7 +10,7 @@ module.exports = {
       websockets: true
     },
     remote: {
-      host: "34.245.49.226",
+      host: "52.50.193.34",
       port: 9501,
       network_id: "1515",
       websockets: true
