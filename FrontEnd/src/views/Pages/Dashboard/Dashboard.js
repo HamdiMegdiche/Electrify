@@ -315,7 +315,7 @@ class Dashboard extends Component {
     console.log("Get initial data ");
     //----------------------weather and consumption socket ------------------------------------------------
     socket.on("FromAPI", data => {
-      console.log('data:', data)
+      // console.log('data:', data)
       if (data.temp ==='None')
       {
         this.setState({humidity: '000'});
