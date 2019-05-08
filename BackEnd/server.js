@@ -6,7 +6,6 @@ const logger = require('morgan');
 const methodOverride = require('method-override');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
-// changed var name from "bp" to "bodyParser";
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const errorHandler = require('errorhandler');
