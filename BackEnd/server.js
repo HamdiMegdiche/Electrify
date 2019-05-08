@@ -16,7 +16,7 @@ let app = express();
 let server = require('http').createServer(app);
 
 // connect to mongoDB Remote
-let mongoUrl = process.env.MONGO_CONNECTION_STRING_REMOTE;
+let mongoUrl = process.env.MONGO_CONNECTION_STRING;
 
 mongoose.Promise = global.Promise;
 mongoose
