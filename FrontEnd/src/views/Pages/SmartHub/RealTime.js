@@ -69,7 +69,6 @@ export default class RealTime extends Component {
     max2 = 0;
     max3 = 0;
     maxValue = 0;
-    // Houni 3ayet lil api mta3 l'python wala l'faza hethika.
     try {
       const res = await api
         .get(
@@ -209,10 +208,7 @@ export default class RealTime extends Component {
   }
 
   async componentWillMount() {
-    // Chouf hethi ya skan
     this.interval = setInterval(() => this.updateChart(), 60000);
-    // Hethi t7otelha l'wa9t 60000 = 1min ou ta3tiha chneya l'function eli chye5demha
-    // Chouf hethi ya skan
     try {
       const res = await api
         .get(
