@@ -59,8 +59,6 @@ router.post('/register', (req, res) => {
 // @access  Public
 router.post('/login', (req, res) => {
 
-
-
   let { username, password } = req.body;
 
   // Find user by username
