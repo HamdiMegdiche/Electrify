@@ -131,7 +131,7 @@ class OfferForm extends Component {
 
   componentDidMount() {
     const {user} = this.props;
-    const socket = socketIOClient(process.env.backend_url, { transports: ['websocket'] });
+    const socket = socketIOClient(process.env.REACT_APP_backend_url, { transports: ['websocket'] });
     socket.on("FromAPI", data => {
       console.log('data:', data)
 
