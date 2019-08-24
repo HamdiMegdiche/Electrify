@@ -27,7 +27,7 @@ If you have a windows OS you must follow these steps.
 
 ### Preinstallation 2 (To run a test blockchain)
 
-Install `hanache` [here](https://truffleframework.com/ganache) and make sure that is running at `http://127.0.0.1:7545`.
+Install `ganache` [here](https://truffleframework.com/ganache) and make sure that is running at `http://127.0.0.1:7545`.
 
 Install `MetaMask` extension [here](https://metamask.io/) and follow the documentation to :
 
